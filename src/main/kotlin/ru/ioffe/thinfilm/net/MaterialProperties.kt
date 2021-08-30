@@ -64,11 +64,4 @@ sealed class MaterialProperties {
 
     }
 
-    @Serializable
-    @SerialName("formula 1")
-    data class FormulaOne(val data: String) : MaterialProperties() {
-
-
-    }
-
 }

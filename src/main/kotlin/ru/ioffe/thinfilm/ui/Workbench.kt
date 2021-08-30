@@ -55,7 +55,7 @@ class Workbench() : View() {
         }
     }
 
-    fun load(): MaterialProperties {
+    private fun load(): MaterialProperties {
         val library = Library()
         val shelves = library.fetch().shelves
         return library.entry(shelves.get(0).content.get(0).content.get(0)).data[0]

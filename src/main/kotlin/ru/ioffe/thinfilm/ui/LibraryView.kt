@@ -26,9 +26,9 @@ class LibraryView : View() {
             }
             populate { parent ->
                 val value = parent.value
-                if (parent == root) shelves()
-                else if (value is Shelf) books(value)
-                else if (value is Shelf.Book) pages(value)
+                if (parent == root) record.shelves
+                else if (value is Shelf) value.content
+                else if (value is Shelf.Book) value.content
                 else null
             }
         }
@@ -56,19 +56,7 @@ class LibraryView : View() {
 
     }
 
-    fun shelves(): List<Shelf> {
-        return record.shelves
-    }
-
-    fun books(shelf: Shelf): List<Shelf.Book> {
-        return shelf.content
-    }
-
-    fun pages(book: Shelf.Book): List<Shelf.Book.Page> {
-        return book.content
-    }
-
-    fun material(page: Shelf.Book.Page): MaterialProperties {
+    private fun material(page: Shelf.Book.Page): MaterialProperties {
         return library.entry(page).data[0]
     }
 
