@@ -1,6 +1,7 @@
 package ru.ioffe.thinfilm.ui
 
 import javafx.scene.input.KeyCombination
+import ru.ioffe.thinfilm.ui.library.LibraryView
 import tornadofx.*
 
 class RootView : View() {
