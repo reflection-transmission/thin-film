@@ -24,8 +24,8 @@ dependencies {
     implementation("org.apache.commons:commons-math3:3.0")
     implementation("com.charleskorn.kaml:kaml:0.35.1")
     implementation("no.tornado:tornadofx:1.7.20")
-    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:3.0.1")
-    implementation("org.jetbrains.lets-plot:lets-plot-jfx:2.0.5-rc1")
+    implementation("org.jetbrains.kotlinx:multik-api:0.0.1")
+    implementation("org.jetbrains.kotlinx:multik-default:0.0.1")
     testImplementation(kotlin("test"))
 }
 
