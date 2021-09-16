@@ -1,27 +1,30 @@
 package ru.ioffe.thinfilm.core.model
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleObjectProperty
-import tornadofx.getValue
-import tornadofx.setValue
+import org.jetbrains.kotlinx.multik.api.mk
+import org.jetbrains.kotlinx.multik.api.ndarray
+import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
+import ru.ioffe.thinfilm.core.math.Complex
+import ru.ioffe.thinfilm.net.MaterialProperties
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
-class Layer(id: Int, depth: Double, fulfill: Double, material: Material, enabled: Boolean) {
-    val idProperty = SimpleIntegerProperty(id)
-    var id by idProperty
+/**
+ * Classes extending this interface should define a way how the optical layer changes the spectrum going through it
+ *
+ */
+abstract class Layer(val properties: MaterialProperties, val depth: Double, val fulfill: Double) {
 
-    val depthProperty = SimpleDoubleProperty(depth)
-    var depth by depthProperty
+    abstract fun apply(spectrum: Spectrum): Spectrum
 
-    val fulfillProperty = SimpleDoubleProperty(fulfill)
-    var fulfill by fulfillProperty
+    private fun phi(wavelength: Double): Double = 2 * PI * properties.n(wavelength) * depth / wavelength
 
-    val materialProperty = SimpleObjectProperty(material)
-    var material by materialProperty
-
-    val enabledProperty = SimpleBooleanProperty(enabled)
-    var enabled by enabledProperty
-
+    fun m(wavelength: Double): D2Array<Complex> {
+        val a = Complex(cos(phi(wavelength)))
+        val b = Complex(0.0, sin(phi(wavelength)) / properties.n(wavelength))
+        val c = Complex(0.0, sin(phi(wavelength)) * properties.n(wavelength))
+        val d = Complex(cos(phi(wavelength)))
+        return mk.ndarray(mk[mk[a, b], mk[c, d]])
+    }
 
 }

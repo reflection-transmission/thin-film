@@ -1,7 +1,7 @@
 package ru.ioffe.thinfilm.ui
 
 import javafx.scene.chart.NumberAxis
-import ru.ioffe.thinfilm.core.model.Layer
+import ru.ioffe.thinfilm.ui.databinding.FilmLayerModel
 import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.net.Library
 import ru.ioffe.thinfilm.net.MaterialProperties
@@ -10,11 +10,11 @@ import tornadofx.*
 class Workbench() : View() {
 
     private val layers = listOf(
-        Layer(1, 1.0, 1.0, Material("ITO250"), true),
-        Layer(2, 1.0, 1.0, Material("ITO250"), true),
-        Layer(3, 1.0, 1.0, Material("ITO250"), true),
-        Layer(4, 1.0, 1.0, Material("ITO250"), true),
-        Layer(5, 1.0, 1.0, Material("ITO250"), true)
+        FilmLayerModel(1, 1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(2, 1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(3, 1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(4, 1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(5, 1.0, 1.0, Material("ITO250"), true)
     ).asObservable()
 
     private val materials = listOf(
@@ -35,11 +35,11 @@ class Workbench() : View() {
                 }
                 useMaxWidth = true
                 isEditable = true
-                readonlyColumn("number", Layer::id)
-                column("depth (nm)", Layer::depthProperty).makeEditable()
-                column("fulfill", Layer::fulfillProperty).makeEditable()
-                column("material", Layer::materialProperty).useComboBox(materials).cellFormat { text = it!!.name }
-                column("enabled", Layer::enabledProperty).useCheckbox()
+                readonlyColumn("number", FilmLayerModel::id)
+                column("depth (nm)", FilmLayerModel::depthProperty).makeEditable()
+                column("fulfill", FilmLayerModel::fulfillProperty).makeEditable()
+                column("material", FilmLayerModel::materialProperty).useComboBox(materials).cellFormat { text = it!!.name }
+                column("enabled", FilmLayerModel::enabledProperty).useCheckbox()
             }
             linechart("Material n and k", NumberAxis(), NumberAxis()) {
                 series("n") {
