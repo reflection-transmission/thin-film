@@ -26,9 +26,6 @@ class Workbench() : View() {
 
     override val root = gridpane {
         row {
-            button("Run")
-        }
-        row {
             tableview(layers) {
                 gridpaneColumnConstraints {
                     percentWidth = 50.0
@@ -38,10 +35,11 @@ class Workbench() : View() {
                 readonlyColumn("number", FilmLayerModel::id)
                 column("depth (nm)", FilmLayerModel::depthProperty).makeEditable()
                 column("fulfill", FilmLayerModel::fulfillProperty).makeEditable()
-                column("material", FilmLayerModel::materialProperty).useComboBox(materials).cellFormat { text = it!!.name }
+                column("material", FilmLayerModel::materialProperty).useComboBox(materials)
+                    .cellFormat { text = it!!.name }
                 column("enabled", FilmLayerModel::enabledProperty).useCheckbox()
             }
-            linechart("Material n and k", NumberAxis(), NumberAxis()) {
+            val chart = linechart("Material n and k", NumberAxis(), NumberAxis()) {
                 series("n") {
                     val material = load()
                     material.wavelengths().forEach { data(it, material.n(it)) }
@@ -52,6 +50,7 @@ class Workbench() : View() {
                 }
                 setCreateSymbols(false)
             }
+            button("Run").action { Experiment(layers.map { it.layer() }) }
         }
     }
 

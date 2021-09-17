@@ -4,6 +4,8 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
+import ru.ioffe.thinfilm.core.model.FilmLayer
+import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.core.model.Material
 import tornadofx.*
 
@@ -22,5 +24,7 @@ class FilmLayerModel(id: Int, depth: Double, fulfill: Double, material: Material
 
     val enabledProperty = SimpleBooleanProperty(enabled)
     var enabled by enabledProperty
+
+    fun layer(): Layer = FilmLayer(material.properties, depth, fulfill)
 
 }
