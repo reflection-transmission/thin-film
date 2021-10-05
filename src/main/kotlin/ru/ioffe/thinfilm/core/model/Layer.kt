@@ -15,7 +15,7 @@ import kotlin.math.sin
  */
 abstract class Layer(val properties: MaterialProperties, val depth: Double, val fulfill: Double) {
 
-    abstract fun apply(spectrum: Spectrum): Spectrum
+    abstract fun apply(spectrum: Spectrum) : Spectrum
 
     private fun phi(wavelength: Double): Double = 2 * PI * properties.n(wavelength) * depth / wavelength
 
@@ -26,5 +26,7 @@ abstract class Layer(val properties: MaterialProperties, val depth: Double, val 
         val d = Complex(cos(phi(wavelength)))
         return mk.ndarray(mk[mk[a, b], mk[c, d]])
     }
+
+
 
 }

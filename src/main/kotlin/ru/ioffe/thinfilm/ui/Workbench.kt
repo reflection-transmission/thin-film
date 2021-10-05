@@ -1,5 +1,6 @@
 package ru.ioffe.thinfilm.ui
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.scene.chart.NumberAxis
 import ru.ioffe.thinfilm.ui.databinding.FilmLayerModel
 import ru.ioffe.thinfilm.core.model.Material
@@ -9,12 +10,12 @@ import tornadofx.*
 
 class Workbench() : View() {
 
-    private val layers = listOf(
-        FilmLayerModel(1, 1.0, 1.0, Material("ITO250"), true),
-        FilmLayerModel(2, 1.0, 1.0, Material("ITO250"), true),
-        FilmLayerModel(3, 1.0, 1.0, Material("ITO250"), true),
-        FilmLayerModel(4, 1.0, 1.0, Material("ITO250"), true),
-        FilmLayerModel(5, 1.0, 1.0, Material("ITO250"), true)
+    private val layers = mutableListOf(
+        FilmLayerModel(1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(1.0, 1.0, Material("ITO250"), true),
+        FilmLayerModel(1.0, 1.0, Material("ITO250"), true)
     ).asObservable()
 
     private val materials = listOf(
@@ -26,31 +27,43 @@ class Workbench() : View() {
 
     override val root = gridpane {
         row {
-            tableview(layers) {
-                gridpaneColumnConstraints {
-                    percentWidth = 50.0
+            vbox {
+                hbox {
+                    button("Append Layer").action { layers.add(FilmLayerModel(1.0, 1.0, Material("ITO250"), true)) }
+                    button("Tail Layer").action {
+                        if (layers.size > 1) layers.remove(
+                            layers.size - 2,
+                            layers.size - 1
+                        )
+                    }
                 }
-                useMaxWidth = true
-                isEditable = true
-                readonlyColumn("number", FilmLayerModel::id)
-                column("depth (nm)", FilmLayerModel::depthProperty).makeEditable()
-                column("fulfill", FilmLayerModel::fulfillProperty).makeEditable()
-                column("material", FilmLayerModel::materialProperty).useComboBox(materials)
-                    .cellFormat { text = it!!.name }
-                column("enabled", FilmLayerModel::enabledProperty).useCheckbox()
+                tableview(layers) {
+                    gridpaneColumnConstraints {
+                        percentWidth = 50.0
+                    }
+                    useMaxWidth = true
+                    isEditable = true
+                    column("depth (nm)", FilmLayerModel::depthProperty).makeEditable()
+                    column("fulfill", FilmLayerModel::fulfillProperty).makeEditable()
+                    column("material", FilmLayerModel::materialProperty).useComboBox(materials)
+                        .cellFormat { text = it!!.name }
+                    column("enabled", FilmLayerModel::enabledProperty).useCheckbox()
+                }
             }
-            val chart = linechart("Material n and k", NumberAxis(), NumberAxis()) {
-                series("n") {
-                    val material = load()
-                    material.wavelengths().forEach { data(it, material.n(it)) }
+            vbox {
+                val chart = linechart("Material n and k", NumberAxis(), NumberAxis()) {
+                    series("n") {
+                        val material = load()
+                        material.wavelengths().forEach { data(it, material.n(it)) }
+                    }
+                    series("k") {
+                        val material = load()
+                        material.wavelengths().forEach { data(it, material.k(it)) }
+                    }
+                    setCreateSymbols(false)
                 }
-                series("k") {
-                    val material = load()
-                    material.wavelengths().forEach { data(it, material.k(it)) }
-                }
-                setCreateSymbols(false)
+                button("Run").action { Experiment(layers.map { it.layer() }).start().draw(chart) }
             }
-            button("Run").action { Experiment(layers.map { it.layer() }) }
         }
     }
 

@@ -9,9 +9,7 @@ import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.core.model.Material
 import tornadofx.*
 
-class FilmLayerModel(id: Int, depth: Double, fulfill: Double, material: Material, enabled: Boolean) {
-    val idProperty = SimpleIntegerProperty(id)
-    var id by idProperty
+class FilmLayerModel(depth: Double, fulfill: Double, material: Material, enabled: Boolean) {
 
     val depthProperty = SimpleDoubleProperty(depth)
     var depth by depthProperty

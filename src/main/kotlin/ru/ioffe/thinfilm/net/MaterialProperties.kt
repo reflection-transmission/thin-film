@@ -2,6 +2,7 @@ package ru.ioffe.thinfilm.net
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import ru.ioffe.thinfilm.core.math.Complex
 import ru.ioffe.thinfilm.core.math.RefractiveIndex
 
 @Serializable
@@ -16,6 +17,10 @@ sealed class MaterialProperties {
 
     fun k(wavelength: Double): Double {
         return coefficients.get(wavelength)?.k ?: 0.0
+    }
+
+    fun complex(wavelength: Double) : Complex {
+        return Complex(n(wavelength), k(wavelength))
     }
 
     fun wavelengths(): List<Double> {
