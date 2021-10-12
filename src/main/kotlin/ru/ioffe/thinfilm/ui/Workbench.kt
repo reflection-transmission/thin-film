@@ -1,6 +1,8 @@
 package ru.ioffe.thinfilm.ui
 
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.scene.chart.NumberAxis
+import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.net.Library
 import ru.ioffe.thinfilm.net.MaterialProperties
 import ru.ioffe.thinfilm.net.MaterialRegistry
@@ -10,6 +12,8 @@ import tornadofx.*
 class Workbench(private val registry: MaterialRegistry) : View() {
 
     private val layers = mutableListOf<FilmLayerModel>().asObservable()
+    private val from = SimpleIntegerProperty(400)
+    private val to = SimpleIntegerProperty(1600)
 
     override val root = gridpane {
         row {
@@ -22,6 +26,8 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                             layers.size - 1
                         )
                     }
+                    textfield(from)
+                    textfield(to)
                 }
                 tableview(layers) {
                     gridpaneColumnConstraints {
@@ -50,7 +56,12 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                     }
                     setCreateSymbols(false)
                 }
-                button("Run").action { Experiment(layers.map { it.layer(registry) }).start().draw(chart) }
+                button("Run").action {
+                    Experiment(
+                        layers.map { it.layer(registry) },
+                        WavelengthDomain(from.get(), to.get())
+                    ).start().draw(chart)
+                }
             }
         }
     }
