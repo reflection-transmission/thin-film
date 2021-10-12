@@ -23,9 +23,6 @@ javafx {
 dependencies {
     implementation("com.charleskorn.kaml:kaml:0.35.1")
     implementation("no.tornado:tornadofx:1.7.20")
-    implementation("org.jetbrains.kotlinx:multik-api:0.0.1")
-    implementation("org.jetbrains.kotlinx:multik-default:0.0.1")
-    implementation("org.jetbrains.kotlinx:multik-jvm:0.0.1")
     implementation("org.apache.commons:commons-math3:3.5")
     testImplementation(kotlin("test"))
 }

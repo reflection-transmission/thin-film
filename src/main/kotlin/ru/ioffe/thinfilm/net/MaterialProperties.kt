@@ -2,8 +2,10 @@ package ru.ioffe.thinfilm.net
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import ru.ioffe.thinfilm.core.math.Complex
+import org.apache.commons.math3.complex.Complex
+import ru.ioffe.thinfilm.core.math.Interpolate
 import ru.ioffe.thinfilm.core.math.RefractiveIndex
+import java.util.function.Function
 
 @Serializable
 sealed class MaterialProperties {
@@ -12,20 +14,27 @@ sealed class MaterialProperties {
     protected val coefficients = mutableMapOf<Double, RefractiveIndex>()
 
     fun n(wavelength: Double): Double {
-        return coefficients.get(wavelength)?.n ?: 0.0
+        return coefficients[wavelength]?.n ?: interpolate(wavelength, RefractiveIndex::n)
     }
 
     fun k(wavelength: Double): Double {
-        return coefficients.get(wavelength)?.k ?: 0.0
+        return coefficients[wavelength]?.k ?: interpolate(wavelength, RefractiveIndex::k)
     }
 
-    fun complex(wavelength: Double) : Complex {
+    fun complex(wavelength: Double): Complex {
         return Complex(n(wavelength), k(wavelength))
     }
 
     fun wavelengths(): List<Double> {
         return coefficients.keys.toList()
     }
+
+    private fun interpolate(wavelength: Double, transform: Function<RefractiveIndex, Double>): Double =
+        Interpolate().value(
+            coefficients.keys.toDoubleArray(),
+            coefficients.values.map { transform.apply(it) }.toDoubleArray(),
+            wavelength
+        )
 
     @Serializable
     @SerialName("tabulated n")

@@ -1,16 +1,17 @@
 package ru.ioffe.thinfilm.ui
 
-import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
-import org.jetbrains.kotlinx.multik.ndarray.data.get
-import org.jetbrains.kotlinx.multik.ndarray.operations.times
-import ru.ioffe.thinfilm.core.math.Complex
+import org.apache.commons.math3.complex.Complex
+import org.apache.commons.math3.linear.FieldMatrix
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.core.model.Spectrum
 import ru.ioffe.thinfilm.core.model.Wavelength
 import kotlin.math.pow
 
-class Experiment(private val layers: List<Layer>, private val wavelengths: WavelengthDomain = WavelengthDomain.default()) {
+class Experiment(
+    private val layers: List<Layer>,
+    private val wavelengths: WavelengthDomain = WavelengthDomain.default()
+) {
 
     fun start(): Result {
         return Result(
@@ -26,26 +27,48 @@ class Experiment(private val layers: List<Layer>, private val wavelengths: Wavel
 
     private fun trRe(wavelength: Double, ninc: Complex, nout: Complex): DoubleArray {
         val m = m(wavelength)
-        val tr =
-            (nout.re / ninc.re) * (2 * ninc / (ninc * m[1, 1] + nout * m[2, 2] + ninc * nout * m[1, 2] + m[2, 1])).absolute()
-                .pow(2)
-        val re =
-            ((ninc * m[1, 1] - nout * m[2, 2] + ninc * nout * m[1, 2] - m[2, 1]) / (ninc * m[1, 1] + nout * m[2, 2] + ninc * nout * m[1, 2] + m[2, 1])).absolute()
-                .pow(2)
+        val tr = transition(ninc, nout, m)
+        val re = reflection(ninc, nout, m)
+        println("lambda: $wavelength tr: $tr re: $re")
         return doubleArrayOf(tr, re)
     }
 
-    private fun m(wavelength: Double): D2Array<Complex> {
+    private fun reflection(
+        ninc: Complex,
+        nout: Complex,
+        m: FieldMatrix<Complex>
+    ): Double {
+        return ninc.multiply(m.getEntry(0, 0)).subtract(nout.multiply(m.getEntry(1, 1)))
+            .add(ninc.multiply(nout).multiply(m.getEntry(0, 1))).subtract(m.getEntry(1, 0)).divide(
+                ninc.multiply(m.getEntry(0, 0)).add(nout.multiply(m.getEntry(1, 1)))
+                    .add(ninc.multiply(nout).multiply(m.getEntry(0, 1))).add(m.getEntry(1, 0))
+            ).abs().pow(1)
+    }
+
+    private fun transition(
+        ninc: Complex,
+        nout: Complex,
+        m: FieldMatrix<Complex>
+    ): Double {
+        return (nout.real / ninc.real) * (ninc.multiply(2).divide(
+            ninc.multiply(m.getEntry(0, 0)) //
+                .add(nout.multiply(m.getEntry(1, 1))) //
+                .add(ninc.multiply(nout).multiply(m.getEntry(0, 1)) //
+                    .add(m.getEntry(1, 0)))
+        )).abs().pow(2)
+    }
+
+    private fun m(wavelength: Double): FieldMatrix<Complex> {
         var m = layers[0].m(wavelength)
         layers.forEach {
-            m *= it.m(wavelength)
+            m = m.multiply(it.m(wavelength))
         }
         return m
     }
 
     private fun wavelengths(intensity: Double): List<Wavelength> = mutableListOf<Wavelength>().apply {
         for (i in wavelengths.min..wavelengths.max step 1) {
-            add(Wavelength(i.toDouble(), 0.0, intensity))
+            add(Wavelength(i.toDouble() / 1000, 0.0, intensity))
         }
     }
 
