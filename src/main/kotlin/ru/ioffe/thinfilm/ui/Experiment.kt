@@ -11,14 +11,18 @@ class Experiment(
     private val layers: MutableList<Layer>,
     private val substrate: Layer,
     private val wavelengths: WavelengthDomain = WavelengthDomain.default(),
-    private val ambient: Layer = FilmLayer(MaterialProperties.Constant(1.0), 1000.0, 1.0)
+    private val ambient: Layer = Layer(MaterialProperties.Constant(1.0), 1000.0, 1.0)
 ) {
 
     fun start(): Result {
         layers.removeLast()
         val wavelengths = wavelengths().map(this::film).map(this::substrate)
-        wavelengths.forEach { println("length: ${it.length}, transmitted: ${it.transmitted}, reflected: ${it.reflected}") }
+        wavelengths.forEach(this::log)
         return Result(Spectrum(ambient, wavelengths))
+    }
+
+    private fun log(it: Wavelength) {
+        if (!it.transmitted.isNaN() && !it.reflected.isNaN()) println("length: ${it.length}, transmitted: ${it.transmitted}, reflected: ${it.reflected}")
     }
 
     private fun substrate(it: Wavelength) =

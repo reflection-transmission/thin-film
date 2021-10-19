@@ -9,14 +9,10 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 
-/**
- * Classes extending this interface should define a way how the optical layer changes the spectrum going through it
- *
- */
-abstract class Layer(val properties: MaterialProperties, val depth: Double, val fulfill: Double) {
+class Layer(val properties: MaterialProperties, val depth: Double, val fulfill: Double) {
 
     private fun phi(wavelength: Double): Double =
-        2 * PI * properties.n(wavelength) * depth * 10.0.pow(-9) / wavelength / 10.0.pow(-6)
+        2 * PI * properties.n(wavelength) * depth * 10.0.pow(-9) / (wavelength * 10.0.pow(-6))
 
     fun m(wavelength: Double): FieldMatrix<Complex> {
         val a = Complex(cos(phi(wavelength)))
