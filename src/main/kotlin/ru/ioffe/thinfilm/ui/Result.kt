@@ -10,10 +10,10 @@ class Result(private val spectrum: Spectrum) {
     fun draw(chart: LineChart<Number, Number>) {
         chart.data.clear()
         chart.series("Transmitted") {
-            spectrum.transmitted.forEach { data(it.length, it.intensity) }
+            spectrum.wavelengths.forEach { if (!it.transmitted.isNaN()) data(it.length, it.transmitted) }
         }
         chart.series("Reflected") {
-            spectrum.reflected.forEach { data(it.length, it.intensity) }
+            spectrum.wavelengths.forEach { if (!it.reflected.isNaN()) data(it.length, it.reflected) }
         }
     }
 

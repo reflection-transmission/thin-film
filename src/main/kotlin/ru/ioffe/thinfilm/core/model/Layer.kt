@@ -6,6 +6,7 @@ import org.apache.commons.math3.linear.MatrixUtils
 import ru.ioffe.thinfilm.net.MaterialProperties
 import kotlin.math.PI
 import kotlin.math.cos
+import kotlin.math.pow
 import kotlin.math.sin
 
 /**
@@ -14,9 +15,8 @@ import kotlin.math.sin
  */
 abstract class Layer(val properties: MaterialProperties, val depth: Double, val fulfill: Double) {
 
-    abstract fun apply(spectrum: Spectrum): Spectrum
-
-    private fun phi(wavelength: Double): Double = 2 * PI * properties.n(wavelength) * depth / wavelength
+    private fun phi(wavelength: Double): Double =
+        2 * PI * properties.n(wavelength) * depth * 10.0.pow(-9) / wavelength / 10.0.pow(-6)
 
     fun m(wavelength: Double): FieldMatrix<Complex> {
         val a = Complex(cos(phi(wavelength)))

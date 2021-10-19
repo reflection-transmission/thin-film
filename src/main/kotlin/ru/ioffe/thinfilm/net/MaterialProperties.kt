@@ -78,4 +78,12 @@ sealed class MaterialProperties {
 
     }
 
+    data class Constant(val value: Double) : MaterialProperties() {
+        init {
+            for (i in 200..2000) {
+                coefficients.put(i.toDouble() / 1000, RefractiveIndex(value, 0.0))
+            }
+        }
+    }
+
 }
