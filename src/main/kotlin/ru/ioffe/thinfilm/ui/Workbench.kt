@@ -59,11 +59,16 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                     setCreateSymbols(false)
                 }
                 button("Run").action {
-                    Experiment(
-                        layers.map { it.layer(registry) }.toMutableList(),
-                        layers.last().layer(registry),
-                        WavelengthDomain(from.get(), to.get())
-                    ).start().draw(chart)
+                    if (layers.size > 2) {
+                        Experiment(
+                            layers.map { it.layer(registry) }.toMutableList(),
+                            layers.first().layer(registry),
+                            layers.last().layer(registry),
+                            WavelengthDomain(from.get(), to.get())
+                        ).start().draw(chart)
+                    } else {
+                        println("You have to define at least three layers")
+                    }
                 }
             }
         }

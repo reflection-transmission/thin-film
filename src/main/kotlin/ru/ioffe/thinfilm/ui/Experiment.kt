@@ -9,13 +9,14 @@ import kotlin.math.pow
 
 class Experiment(
     private val layers: MutableList<Layer>,
+    private val ambient: Layer,
     private val substrate: Layer,
-    private val wavelengths: WavelengthDomain = WavelengthDomain.default(),
-    private val ambient: Layer = Layer(MaterialProperties.Constant(1.0), 1000.0, 1.0)
+    private val wavelengths: WavelengthDomain = WavelengthDomain.default()
 ) {
 
     fun start(): Result {
         layers.removeLast()
+        layers.removeFirst()
         val wavelengths = wavelengths().map(this::film).map(this::substrate)
         wavelengths.forEach(this::log)
         return Result(Spectrum(ambient, wavelengths))

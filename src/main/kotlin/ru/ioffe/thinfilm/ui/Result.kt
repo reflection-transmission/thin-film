@@ -15,6 +15,14 @@ class Result(private val spectrum: Spectrum) {
         chart.series("Reflected") {
             spectrum.wavelengths.forEach { if (!it.reflected.isNaN()) data(it.length, it.reflected) }
         }
+        chart.series("Absorbed") {
+            spectrum.wavelengths.forEach {
+                if (!it.reflected.isNaN() && !it.transmitted.isNaN()) data(
+                    it.length,
+                    it.absorbed()
+                )
+            }
+        }
     }
 
 }
