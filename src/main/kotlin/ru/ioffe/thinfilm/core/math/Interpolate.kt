@@ -15,7 +15,6 @@ class Interpolate {
                 )
             function.value(wavelength)
         } catch (e: Exception) {
-            e.printStackTrace()
             0.0
         }
     }
