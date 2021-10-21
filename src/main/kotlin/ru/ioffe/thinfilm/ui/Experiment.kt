@@ -3,8 +3,10 @@ package ru.ioffe.thinfilm.ui
 import org.apache.commons.math3.complex.Complex
 import org.apache.commons.math3.linear.FieldMatrix
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
-import ru.ioffe.thinfilm.core.model.*
-import ru.ioffe.thinfilm.net.MaterialProperties
+import ru.ioffe.thinfilm.core.model.Layer
+import ru.ioffe.thinfilm.core.model.Spectrum
+import ru.ioffe.thinfilm.core.model.Substrate
+import ru.ioffe.thinfilm.core.model.Wavelength
 import kotlin.math.pow
 
 class Experiment(
@@ -17,17 +19,10 @@ class Experiment(
     fun start(): Result {
         layers.removeLast()
         layers.removeFirst()
-        val wavelengths = wavelengths().map(this::film).map(this::substrate)
-        wavelengths.forEach(this::log)
-        return Result(Spectrum(ambient, wavelengths))
+        return Result(Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)))
     }
 
-    private fun log(it: Wavelength) {
-        if (!it.transmitted.isNaN() && !it.reflected.isNaN()) println("length: ${it.length}, transmitted: ${it.transmitted}, reflected: ${it.reflected}")
-    }
-
-    private fun substrate(it: Wavelength) =
-        Substrate(substrate.properties, ambient.properties).apply(it)
+    private fun substrate(it: Wavelength) = Substrate(substrate.properties, ambient.properties).apply(it)
 
     private fun film(it: Wavelength) = Wavelength(
         it.length,
@@ -55,7 +50,7 @@ class Experiment(
         val b = m.getEntry(0, 1)
         val c = m.getEntry(1, 0)
         val d = m.getEntry(1, 1)
-        return (ninc * 2.0 / (ninc * a + nout * d + ninc * nout * b + c)).abs().pow(2)* (nout.real / ninc.real)
+        return (ninc * 2.0 / (ninc * a + nout * d + ninc * nout * b + c)).abs().pow(2) * (nout.real / ninc.real)
     }
 
     private fun m(layers: List<Layer>, wavelength: Double): FieldMatrix<Complex> {
