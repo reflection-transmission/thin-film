@@ -55,7 +55,7 @@ class Experiment(
         val b = m.getEntry(0, 1)
         val c = m.getEntry(1, 0)
         val d = m.getEntry(1, 1)
-        return (ninc * 2.0 / (ninc * a + nout * d + ninc * nout * b + c) * (nout.real / ninc.real)).abs().pow(2)
+        return (ninc * 2.0 / (ninc * a + nout * d + ninc * nout * b + c)).abs().pow(2)* (nout.real / ninc.real)
     }
 
     private fun m(layers: List<Layer>, wavelength: Double): FieldMatrix<Complex> {

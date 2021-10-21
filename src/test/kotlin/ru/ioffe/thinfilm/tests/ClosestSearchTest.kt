@@ -1,7 +1,6 @@
 package ru.ioffe.thinfilm.tests
 
 import ru.ioffe.thinfilm.core.math.Closest
-import ru.ioffe.thinfilm.core.math.Interpolate
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
