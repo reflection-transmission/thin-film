@@ -5,7 +5,6 @@ import kotlinx.serialization.Serializable
 import org.apache.commons.math3.complex.Complex
 import ru.ioffe.thinfilm.core.math.Interpolate
 import ru.ioffe.thinfilm.core.math.RefractiveIndex
-import java.util.function.Function
 
 @Serializable
 sealed class MaterialProperties {
@@ -14,11 +13,30 @@ sealed class MaterialProperties {
     protected val coefficients = mutableMapOf<Double, RefractiveIndex>()
 
     fun n(wavelength: Double): Double {
-        return coefficients[wavelength]?.n ?: interpolate(wavelength, RefractiveIndex::n)
+        val n = if (coefficients.containsKey(wavelength)) {
+            coefficients[wavelength]!!.n
+        } else {
+            val res = Interpolate().value(
+                coefficients.keys.toDoubleArray(),
+                coefficients.values.map(RefractiveIndex::n).toDoubleArray(),
+                wavelength
+            )
+            println("wavelength: $wavelength, n: $res")
+            res
+        }
+        return n
     }
 
     fun k(wavelength: Double): Double {
-        return coefficients[wavelength]?.k ?: interpolate(wavelength, RefractiveIndex::k)
+        return if (coefficients.containsKey(wavelength)) {
+            coefficients[wavelength]!!.k
+        } else {
+            Interpolate().value(
+                coefficients.keys.toDoubleArray(),
+                coefficients.values.map(RefractiveIndex::k).toDoubleArray(),
+                wavelength
+            )
+        }
     }
 
     fun complex(wavelength: Double): Complex {
@@ -28,13 +46,6 @@ sealed class MaterialProperties {
     fun wavelengths(): List<Double> {
         return coefficients.keys.toList()
     }
-
-    private fun interpolate(wavelength: Double, transform: Function<RefractiveIndex, Double>): Double =
-        Interpolate().value(
-            coefficients.keys.toDoubleArray(),
-            coefficients.values.map { transform.apply(it) }.toDoubleArray(),
-            wavelength
-        )
 
     @Serializable
     @SerialName("tabulated n")

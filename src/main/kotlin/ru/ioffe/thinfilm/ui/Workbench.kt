@@ -35,10 +35,7 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                         )
                     }
                     button("Tail Layer").action {
-                        if (layers.size > 1) layers.remove(
-                            layers.size - 2,
-                            layers.size - 1
-                        )
+                        if (layers.size > 1) layers.removeLast()
                     }
                     textfield(from)
                     textfield(to)

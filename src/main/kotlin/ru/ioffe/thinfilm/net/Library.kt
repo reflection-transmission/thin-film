@@ -19,7 +19,7 @@ class Library {
     }
 
     fun entry(page: Shelf.Book.Page): Entry {
-        return load("data/".plus(page.data)).parse(Entry.serializer())
+        return load("data/".plus(page.data).replace(" ", "%20")).parse(Entry.serializer())
     }
 
     private fun load(file: String): String {
