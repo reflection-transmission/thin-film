@@ -2,11 +2,11 @@
 
 ## Как запустить dev-версию:
 
-<img alt="alt text" src="img/1.png" width="300" height="auto"/>
+<img alt="alt text" src="img/1.png" width="500" height="auto"/>
 <p></p>
-<img alt="alt text" src="img/2.png" width="300" height="auto"/>
+<img alt="alt text" src="img/2.png" width="500" height="auto"/>
 <p></p>
-<img alt="alt text" src="img/3.png" width="300" height="auto"/>
+<img alt="alt text" src="img/3.png" width="500" height="auto"/>
 
 ## Как пользоваться
 
