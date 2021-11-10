@@ -11,6 +11,7 @@ class MaterialRegistry {
 
     init {
         add(Material("Air", MaterialProperties.Constant(1.0)))
+        add(Material("Constant 2.3", MaterialProperties.Constant(2.3)))
     }
 
     fun add(material: Material) {

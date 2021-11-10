@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "ru.ioffe"
-version = "1.0"
+version = "0.1"
 
 repositories {
     mavenCentral()
@@ -31,11 +31,21 @@ tasks.test {
     useJUnit()
 }
 
+tasks.jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes["Main-Class"] = "ru.ioffe.thinfilm.Main"
+    }
+    configurations["compileClasspath"].forEach { file: File ->
+        from(zipTree(file.absoluteFile))
+    }
+}
+
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "11"
 }
 
 application {
-    mainClass.set("MainKt")
+    mainClass.set("ru.ioffe.thinfilm.Main")
     applicationDefaultJvmArgs = mutableListOf("--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
 }

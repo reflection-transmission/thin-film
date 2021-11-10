@@ -55,7 +55,7 @@ class Experiment(
 
     private fun m(layers: List<Layer>, wavelength: Double): FieldMatrix<Complex> {
         var m = layers[0].m(wavelength)
-        layers.forEach {
+        layers.drop(1).forEach {
             m = m.multiply(it.m(wavelength))
         }
         return m
