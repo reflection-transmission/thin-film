@@ -55,7 +55,7 @@ sealed class MaterialProperties {
     data class TabulatedN(val data: String) : MaterialProperties() {
 
         init {
-            val split = data.split(" ")
+            val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
             for (i in split.indices step 2) {
                 dispersion[split[i].toDouble()] = RefractiveIndex(split[i + 1].trim().toDouble(), 0.0)
             }
@@ -122,7 +122,7 @@ sealed class MaterialProperties {
     data class TabulatedK(val data: String) : MaterialProperties() {
 
         init {
-            val split = data.split(" ")
+            val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
             for (i in split.indices step 2) {
                 dispersion[split[i].toDouble()] = RefractiveIndex(0.0, split[i + 1].trim().toDouble())
             }
