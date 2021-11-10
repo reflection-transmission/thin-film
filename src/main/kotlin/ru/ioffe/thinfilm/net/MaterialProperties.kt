@@ -5,20 +5,23 @@ import kotlinx.serialization.Serializable
 import org.apache.commons.math3.complex.Complex
 import ru.ioffe.thinfilm.core.math.Interpolate
 import ru.ioffe.thinfilm.core.math.RefractiveIndex
+import kotlin.math.pow
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
 
 @Serializable
 sealed class MaterialProperties {
 
     @kotlinx.serialization.Transient
-    protected val coefficients = mutableMapOf<Double, RefractiveIndex>()
+    protected val dispersion = mutableMapOf<Double, RefractiveIndex>()
 
     fun n(wavelength: Double): Double {
-        val n = if (coefficients.containsKey(wavelength)) {
-            coefficients[wavelength]!!.n
+        val n = if (dispersion.containsKey(wavelength)) {
+            dispersion[wavelength]!!.n
         } else {
             val res = Interpolate().value(
-                coefficients.keys.toDoubleArray(),
-                coefficients.values.map(RefractiveIndex::n).toDoubleArray(),
+                dispersion.keys.toDoubleArray(),
+                dispersion.values.map(RefractiveIndex::n).toDoubleArray(),
                 wavelength
             )
             println("wavelength: $wavelength, n: $res")
@@ -28,12 +31,12 @@ sealed class MaterialProperties {
     }
 
     fun k(wavelength: Double): Double {
-        return if (coefficients.containsKey(wavelength)) {
-            coefficients[wavelength]!!.k
+        return if (dispersion.containsKey(wavelength)) {
+            dispersion[wavelength]!!.k
         } else {
             Interpolate().value(
-                coefficients.keys.toDoubleArray(),
-                coefficients.values.map(RefractiveIndex::k).toDoubleArray(),
+                dispersion.keys.toDoubleArray(),
+                dispersion.values.map(RefractiveIndex::k).toDoubleArray(),
                 wavelength
             )
         }
@@ -44,7 +47,7 @@ sealed class MaterialProperties {
     }
 
     fun wavelengths(): List<Double> {
-        return coefficients.keys.toList()
+        return dispersion.keys.toList()
     }
 
     @Serializable
@@ -54,7 +57,7 @@ sealed class MaterialProperties {
         init {
             val split = data.split(" ")
             for (i in split.indices step 2) {
-                coefficients.put(split[i].toDouble(), RefractiveIndex(split[i + 1].trim().toDouble(), 0.0))
+                dispersion[split[i].toDouble()] = RefractiveIndex(split[i + 1].trim().toDouble(), 0.0)
             }
         }
 
@@ -70,11 +73,49 @@ sealed class MaterialProperties {
                 val wavelength = split[i].toDouble()
                 val n = split[i + 1].trim().toDouble()
                 val k = split[i + 2].trim().toDouble()
-                coefficients.put(wavelength, RefractiveIndex(n, k))
+                dispersion[wavelength] = RefractiveIndex(n, k)
             }
         }
 
     }
+
+    @Serializable
+    @SerialName("formula 1")
+    data class FormulaOne(val wavelength_range: String, val coefficients: String) : MaterialProperties() {
+
+        init {
+            val range = wavelength_range.split(" ").map(String::toDouble).map { (it * 1000).roundToInt() }
+            val cs = coefficients.split(" ").map(String::toDouble)
+            for (i in range[0]..range[1] step 1) {
+                val wavelength = (i * 10.0.pow(-3))
+                var value = cs[0] + 1
+                for (j in 1 until cs.size step 2) {
+                    value += cs[j] * wavelength.pow(2) / (wavelength.pow(2) - cs[j + 1].pow(2))
+                }
+                dispersion[wavelength] = RefractiveIndex(sqrt(value), 0.0)
+            }
+        }
+    }
+
+    @Serializable
+    @SerialName("formula 2")
+    data class FormulaTwo(val wavelength_range: String, val coefficients: String) : MaterialProperties() {
+
+        init {
+            val range = wavelength_range.split(" ").map(String::toDouble).map { (it * 1000).roundToInt() }
+            val cs = coefficients.split(" ").map(String::toDouble)
+            for (i in range[0]..range[1] step 1) {
+                val wavelength = (i * 10.0.pow(-3))
+                var value = cs[0] + 1
+                for (j in 1 until cs.size step 2) {
+                    value += cs[j] * wavelength.pow(2) / (wavelength.pow(2) - cs[j + 1])
+                }
+                dispersion[wavelength] = RefractiveIndex(sqrt(value), 0.0)
+            }
+        }
+
+    }
+
 
     @Serializable
     @SerialName("tabulated k")
@@ -83,7 +124,7 @@ sealed class MaterialProperties {
         init {
             val split = data.split(" ")
             for (i in split.indices step 2) {
-                coefficients.put(split[i].toDouble(), RefractiveIndex(0.0, split[i + 1].trim().toDouble()))
+                dispersion[split[i].toDouble()] = RefractiveIndex(0.0, split[i + 1].trim().toDouble())
             }
         }
 
@@ -92,7 +133,7 @@ sealed class MaterialProperties {
     data class Constant(val value: Double) : MaterialProperties() {
         init {
             for (i in 200..2000) {
-                coefficients.put(i.toDouble() / 1000, RefractiveIndex(value, 0.0))
+                dispersion[i.toDouble() / 1000] = RefractiveIndex(value, 0.0)
             }
         }
     }

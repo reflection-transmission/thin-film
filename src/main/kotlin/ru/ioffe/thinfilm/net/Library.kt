@@ -25,8 +25,8 @@ class Library {
     private fun load(file: String): String {
         return URL(
             "https",
-            "raw.github.com",
-            "polyanskiy/refractiveindex.info-database/master/database/$file"
+            "raw.githubusercontent.com",
+            "/polyanskiy/refractiveindex.info-database/master/database/$file"
         ).readText()
     }
 
