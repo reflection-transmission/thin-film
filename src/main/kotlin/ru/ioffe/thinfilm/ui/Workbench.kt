@@ -1,11 +1,15 @@
 package ru.ioffe.thinfilm.ui
 
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.css.PseudoClass
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.paint.Color
+import javafx.util.converter.DoubleStringConverter
+import javafx.util.converter.NumberStringConverter
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.net.MaterialRegistry
 import ru.ioffe.thinfilm.ui.databinding.LayerModel
@@ -35,6 +39,12 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                 hbox {
                     gridpaneColumnConstraints {
                         percentWidth = 50.0
+                    }
+                    button("➕").action {
+                        layers.add(
+                            layers.size - 1,
+                            LayerModel(LayerModel.Film, 1.0, 1.0, MaterialReference(registry, 0))
+                        )
                     }
                     textfield(from)
                     textfield(to)
@@ -71,7 +81,16 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                             else -> "Undefined"
                         }
                     }
-                    column("Depth (nm)", LayerModel::depthProperty).makeEditable()
+                    column("Depth (nm)", LayerModel::depthProperty) {
+                        makeEditable()
+                        useTextField(NumberStringConverter()) {
+                            val element = it.rowValue
+                            if (element.type == LayerModel.Film) {
+                                text = element.depth.toString()
+                                isEditable = true
+                            } else isEditable = false
+                        }
+                    }
                     column("Fulfill", LayerModel::fulfillProperty).makeEditable()
                     column("Material", LayerModel::materialProperty) {
                         useComboBox(indexes)
@@ -82,7 +101,7 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                         if (element.type == 0) {
                             graphic = hbox {
                                 useMaxWidth = true
-                                button("remove") {
+                                button("❌") {
                                     style {
                                         backgroundColor += Color.TRANSPARENT
                                     }
@@ -97,14 +116,6 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                         }
                     }
                     smartResize()
-                }
-                hbox {
-                    button(" + ").action {
-                        layers.add(
-                            layers.size - 1,
-                            LayerModel(LayerModel.Film, 1.0, 1.0, MaterialReference(registry, 0))
-                        )
-                    }
                 }
             }
             vbox {

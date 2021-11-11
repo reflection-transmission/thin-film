@@ -27,8 +27,8 @@ class Experiment(
     private fun film(it: Wavelength) = Wavelength(
         it.length,
         it.angle,
-        transition(layers, ambient, substrate, it.length),
-        reflection(layers, ambient, substrate, it.length)
+        transition(layers.filter(Layer::enabled), ambient, substrate, it.length),
+        reflection(layers.filter(Layer::enabled), ambient, substrate, it.length)
     )
 
     private fun reflection(layers: List<Layer>, inc: Layer, out: Layer, wavelength: Double): Double {
