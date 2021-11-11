@@ -10,7 +10,12 @@ import kotlin.math.cos
 import kotlin.math.pow
 import kotlin.math.sin
 
-class Layer(val properties: MaterialProperties, private val depth: Double, private val fulfill: Double) {
+class Layer(
+    val properties: MaterialProperties,
+    private val depth: Double,
+    private val fulfill: Double,
+    val enabled: Boolean
+) {
 
     private fun phi(wavelength: Double): Double =
         2 * PI * properties.n(wavelength) * depth * 10.0.pow(-9) / (wavelength * 10.0.pow(-6))

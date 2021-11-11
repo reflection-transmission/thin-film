@@ -16,7 +16,7 @@ sealed class MaterialProperties {
     protected val dispersion = mutableMapOf<Double, RefractiveIndex>()
 
     fun n(wavelength: Double): Double {
-        val n = if (dispersion.containsKey(wavelength)) {
+        return if (dispersion.containsKey(wavelength)) {
             dispersion[wavelength]!!.n
         } else {
             val res = Interpolate().value(
@@ -27,7 +27,6 @@ sealed class MaterialProperties {
             println("wavelength: $wavelength, n: $res")
             res
         }
-        return n
     }
 
     fun k(wavelength: Double): Double {
