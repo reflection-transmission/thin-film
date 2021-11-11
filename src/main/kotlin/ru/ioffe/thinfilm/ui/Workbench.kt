@@ -33,10 +33,17 @@ class Workbench(private val registry: MaterialRegistry) : View() {
     }
 
     override val root = gridpane {
+        vgap = 5.0
+        style {
+            padding = box(5.px)
+        }
         row {
             lateinit var chart: LineChart<Number, Number>
             vbox {
-                hbox {
+                hbox(spacing = 5) {
+                    style {
+                        padding = box(0.px, 0.px, 5.px, 0.px)
+                    }
                     gridpaneColumnConstraints {
                         percentWidth = 50.0
                     }
@@ -125,6 +132,9 @@ class Workbench(private val registry: MaterialRegistry) : View() {
             }
         }
         row {
+            style {
+                padding = box(5.px, 0.px, 0.px, 0.px)
+            }
             textarea(output) {
                 isEditable = false
                 gridpaneConstraints {
