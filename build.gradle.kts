@@ -21,9 +21,10 @@ javafx {
 }
 
 dependencies {
-    implementation("com.charleskorn.kaml:kaml:0.35.1")
+    implementation("com.charleskorn.kaml:kaml:0.36.0")
     implementation("no.tornado:tornadofx:1.7.20")
-    implementation("org.apache.commons:commons-math3:3.5")
+    implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("org.snakeyaml:snakeyaml-engine:2.3")
     testImplementation(kotlin("test"))
 }
 
@@ -47,5 +48,7 @@ tasks.withType<KotlinCompile>() {
 
 application {
     mainClass.set("ru.ioffe.thinfilm.Main")
-    applicationDefaultJvmArgs = mutableListOf("--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED")
+    applicationDefaultJvmArgs = mutableListOf("--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED",
+        "--add-opens=javafx.controls/javafx.scene.control=ALL-UNNAMED",
+        "--add-opens=javafx.graphics/javafx.scene.graphics=ALL-UNNAMED")
 }

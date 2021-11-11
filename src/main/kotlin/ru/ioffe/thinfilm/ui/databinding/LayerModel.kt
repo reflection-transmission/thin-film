@@ -1,12 +1,22 @@
 package ru.ioffe.thinfilm.ui.databinding
 
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.net.MaterialRegistry
 import tornadofx.*
 
-class FilmLayerModel(depth: Double, fulfill: Double, material: MaterialReference) {
+class LayerModel(type: Int, depth: Double, fulfill: Double, material: MaterialReference) {
+
+    companion object {
+        val Ambient = 1
+        val Film = 0
+        val Substrate = 2
+    }
+
+    val typeProperty = SimpleIntegerProperty(type)
+    var type by typeProperty
 
     val depthProperty = SimpleDoubleProperty(depth)
     var depth by depthProperty
