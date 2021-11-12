@@ -1,27 +1,26 @@
 package ru.ioffe.thinfilm.ui
 
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
-import javafx.css.PseudoClass
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.paint.Color
-import javafx.util.converter.DoubleStringConverter
 import javafx.util.converter.NumberStringConverter
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.net.MaterialRegistry
 import ru.ioffe.thinfilm.ui.databinding.LayerModel
 import ru.ioffe.thinfilm.ui.databinding.MaterialReference
+import ru.ioffe.thinfilm.ui.library.LibraryView
 import tornadofx.*
 
-class Workbench(private val registry: MaterialRegistry) : View() {
+class Workbench : View() {
 
     private val layers = mutableListOf<LayerModel>().asObservable()
     private val from = SimpleIntegerProperty(400)
     private val to = SimpleIntegerProperty(1600)
     private val output = SimpleStringProperty()
+    private val registry = MaterialRegistry()
 
     private val indexes = FXCollections.observableArrayList<MaterialReference>()
 
@@ -46,6 +45,9 @@ class Workbench(private val registry: MaterialRegistry) : View() {
                     }
                     gridpaneColumnConstraints {
                         percentWidth = 50.0
+                    }
+                    button("\uD83D\uDCDA").action {
+                        openInternalWindow(LibraryView(registry))
                     }
                     button("➕").action {
                         layers.add(

@@ -1,9 +1,12 @@
 package ru.ioffe.thinfilm.ui.library
 
-import javafx.beans.property.SimpleBooleanProperty
+import javafx.geometry.Pos
+import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
+import javafx.scene.control.Button
 import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
+import javafx.scene.paint.Color
 import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.net.Library
 import ru.ioffe.thinfilm.net.MaterialProperties
@@ -15,41 +18,73 @@ class LibraryView(private val materialRegistry: MaterialRegistry) : View() {
 
     private val library = Library()
     private val record = library.fetch()
+    private val selected = mutableListOf<Shelf.Book.Page>().asObservable()
 
     override val root = hbox {
+        style {
+            padding = box(5.px)
+        }
         val tree = treeview<Any> {
             configure()
         }
+        lateinit var add: Button
+        lateinit var chart: LineChart<Number, Number>
         vbox {
-            val chart = linechart("Material Data", NumberAxis(), NumberAxis()) {
+            style {
+                padding = box(0.px, 5.px)
+            }
+            chart = linechart("Material Data", NumberAxis(), NumberAxis()) {
                 createSymbols = false
             }
-            val add = this.button("Add")
-            val remove = this.button("Remove")
-            tree.selectionModel.selectedItemProperty().addListener(
-                javafx.beans.value.ChangeListener { _, _, newValue ->
-                    chart.data.clear()
-                    val value = newValue.value
-                    if (value is Shelf.Book.Page) {
-                        val material = material(value)
-                        val entry = Material(value.name, material)
-                        chart.series("n") {
-                            material.wavelengths().forEach {
-                                data(it, material.n(it))
-                            }
+            hbox {
+                alignment = Pos.BASELINE_RIGHT
+                add = this.button("Add")
+            }
+        }
+        val list = listview(selected) {
+            cellFormat {
+                val item: Shelf.Book.Page = this@cellFormat.item
+                graphic = hbox(spacing = 5) {
+                    alignment = Pos.BASELINE_LEFT
+                    label(item.name)
+                    button("❌") {
+                        style {
+                            backgroundColor += Color.TRANSPARENT
                         }
-                        chart.series("k") {
-                            material.wavelengths().forEach {
-                                data(it, material.k(it))
-                            }
+                        action {
+                            selected.remove(item)
                         }
-                        add.enableWhen { SimpleBooleanProperty(!materialRegistry.added(entry)) }
-                        add.action { materialRegistry.add(entry) }
-                        remove.enableWhen { SimpleBooleanProperty(materialRegistry.added(entry)) }
-                        remove.action { materialRegistry.remove(entry) }
                     }
                 }
-            )
+            }
+        }
+        list.selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+            draw(chart, newValue, add)
+        }
+        tree.selectionModel.selectedItemProperty().addListener { _, _, newValue ->
+            draw(chart, newValue.value, add)
+        }
+    }
+
+    private fun draw(chart: LineChart<Number, Number>, value: Any?, add: Button) {
+        chart.data.clear()
+        if (value is Shelf.Book.Page) {
+            val material = material(value)
+            val entry = Material(value.name, material)
+            chart.series("n") {
+                material.wavelengths().forEach {
+                    data(it, material.n(it))
+                }
+            }
+            chart.series("k") {
+                material.wavelengths().forEach {
+                    data(it, material.k(it))
+                }
+            }
+            add.action {
+                materialRegistry.add(entry)
+                selected.add(value)
+            }
         }
     }
 
