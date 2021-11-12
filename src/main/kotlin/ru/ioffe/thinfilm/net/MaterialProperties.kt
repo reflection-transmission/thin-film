@@ -4,7 +4,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.apache.commons.math3.complex.Complex
 import ru.ioffe.thinfilm.core.math.Interpolate
-import ru.ioffe.thinfilm.core.math.RefractiveIndex
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -13,15 +12,15 @@ import kotlin.math.sqrt
 sealed class MaterialProperties {
 
     @kotlinx.serialization.Transient
-    protected val dispersion = mutableMapOf<Double, RefractiveIndex>()
+    protected val dispersion = mutableMapOf<Double, Complex>()
 
     fun n(wavelength: Double): Double {
         return if (dispersion.containsKey(wavelength)) {
-            dispersion[wavelength]!!.n
+            dispersion[wavelength]!!.real
         } else {
             val res = Interpolate().value(
                 dispersion.keys.toDoubleArray(),
-                dispersion.values.map(RefractiveIndex::n).toDoubleArray(),
+                dispersion.values.map(Complex::getReal).toDoubleArray(),
                 wavelength
             )
             println("wavelength: $wavelength, n: $res")
@@ -31,18 +30,18 @@ sealed class MaterialProperties {
 
     fun k(wavelength: Double): Double {
         return if (dispersion.containsKey(wavelength)) {
-            dispersion[wavelength]!!.k
+            dispersion[wavelength]!!.imaginary
         } else {
             Interpolate().value(
                 dispersion.keys.toDoubleArray(),
-                dispersion.values.map(RefractiveIndex::k).toDoubleArray(),
+                dispersion.values.map(Complex::getImaginary).toDoubleArray(),
                 wavelength
             )
         }
     }
 
     fun complex(wavelength: Double): Complex {
-        return Complex(n(wavelength), k(wavelength))
+        return dispersion[wavelength] ?: Complex(0.0)
     }
 
     fun wavelengths(): List<Double> {
@@ -56,7 +55,7 @@ sealed class MaterialProperties {
         init {
             val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
             for (i in split.indices step 2) {
-                dispersion[split[i].toDouble()] = RefractiveIndex(split[i + 1].trim().toDouble(), 0.0)
+                dispersion[split[i].toDouble()] = Complex(split[i + 1].trim().toDouble(), 0.0)
             }
         }
 
@@ -72,7 +71,7 @@ sealed class MaterialProperties {
                 val wavelength = split[i].toDouble()
                 val n = split[i + 1].trim().toDouble()
                 val k = split[i + 2].trim().toDouble()
-                dispersion[wavelength] = RefractiveIndex(n, k)
+                dispersion[wavelength] = Complex(n, k)
             }
         }
 
@@ -91,7 +90,7 @@ sealed class MaterialProperties {
                 for (j in 1 until cs.size step 2) {
                     value += cs[j] * wavelength.pow(2) / (wavelength.pow(2) - cs[j + 1].pow(2))
                 }
-                dispersion[wavelength] = RefractiveIndex(sqrt(value), 0.0)
+                dispersion[wavelength] = Complex(sqrt(value), 0.0)
             }
         }
     }
@@ -109,7 +108,7 @@ sealed class MaterialProperties {
                 for (j in 1 until cs.size step 2) {
                     value += cs[j] * wavelength.pow(2) / (wavelength.pow(2) - cs[j + 1])
                 }
-                dispersion[wavelength] = RefractiveIndex(sqrt(value), 0.0)
+                dispersion[wavelength] = Complex(sqrt(value), 0.0)
             }
         }
 
@@ -123,7 +122,7 @@ sealed class MaterialProperties {
         init {
             val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
             for (i in split.indices step 2) {
-                dispersion[split[i].toDouble()] = RefractiveIndex(0.0, split[i + 1].trim().toDouble())
+                dispersion[split[i].toDouble()] = Complex(0.0, split[i + 1].trim().toDouble())
             }
         }
 
@@ -132,7 +131,7 @@ sealed class MaterialProperties {
     data class Constant(val value: Double) : MaterialProperties() {
         init {
             for (i in 200..2000) {
-                dispersion[i.toDouble() / 1000] = RefractiveIndex(value, 0.0)
+                dispersion[i.toDouble() / 1000] = Complex(value, 0.0)
             }
         }
     }

@@ -31,6 +31,6 @@ class LayerModel(type: Int, depth: Double, fulfill: Double, material: MaterialRe
     val enabledProperty = SimpleBooleanProperty(enabled)
     var enabled by enabledProperty
 
-    fun layer(registry: MaterialRegistry): Layer = Layer(registry.get(material.id).properties, depth, fulfill, enabled)
+    fun layer(registry: MaterialRegistry): Layer = Layer(registry.get(material).properties, depth, fulfill, enabled)
 
 }

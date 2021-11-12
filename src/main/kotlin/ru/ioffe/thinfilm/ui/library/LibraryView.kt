@@ -1,5 +1,6 @@
 package ru.ioffe.thinfilm.ui.library
 
+import javafx.collections.FXCollections
 import javafx.geometry.Pos
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
@@ -12,13 +13,25 @@ import ru.ioffe.thinfilm.net.Library
 import ru.ioffe.thinfilm.net.MaterialProperties
 import ru.ioffe.thinfilm.net.MaterialRegistry
 import ru.ioffe.thinfilm.net.Shelf
+import ru.ioffe.thinfilm.ui.databinding.MaterialReference
 import tornadofx.*
 
-class LibraryView(private val materialRegistry: MaterialRegistry) : View() {
+class LibraryView(private val registry: MaterialRegistry) : View() {
 
     private val library = Library()
     private val record = library.fetch()
-    private val selected = mutableListOf<Shelf.Book.Page>().asObservable()
+    private val selected = FXCollections.observableArrayList<MaterialReference>()
+
+    init {
+        title = "RefractiveIndex.info Library"
+        registry.subscribe(selected)
+        selected.removeIf { registry.get(it).properties is MaterialProperties.Constant }
+    }
+
+    override fun onUndock() {
+        super.onUndock()
+        registry.subscribe(selected)
+    }
 
     override val root = hbox {
         style {
@@ -43,7 +56,7 @@ class LibraryView(private val materialRegistry: MaterialRegistry) : View() {
         }
         val list = listview(selected) {
             cellFormat {
-                val item: Shelf.Book.Page = this@cellFormat.item
+                val item: Material = registry.get(this@cellFormat.item)
                 graphic = hbox(spacing = 5) {
                     alignment = Pos.BASELINE_LEFT
                     label(item.name)
@@ -52,7 +65,7 @@ class LibraryView(private val materialRegistry: MaterialRegistry) : View() {
                             backgroundColor += Color.TRANSPARENT
                         }
                         action {
-                            selected.remove(item)
+                            registry.remove(item)
                         }
                     }
                 }
@@ -82,8 +95,7 @@ class LibraryView(private val materialRegistry: MaterialRegistry) : View() {
                 }
             }
             add.action {
-                materialRegistry.add(entry)
-                selected.add(value)
+                registry.add(entry)
             }
         }
     }
@@ -101,7 +113,7 @@ class LibraryView(private val materialRegistry: MaterialRegistry) : View() {
         }
         populate { parent ->
             val value = parent.value
-            if (parent == root) record.shelves
+            if (parent == root) record
             else if (value is Shelf) value.content
             else if (value is Shelf.Book) value.content
             else null

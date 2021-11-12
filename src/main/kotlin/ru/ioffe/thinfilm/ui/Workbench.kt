@@ -3,9 +3,12 @@ package ru.ioffe.thinfilm.ui
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
+import javafx.geometry.Pos
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.paint.Color
+import javafx.util.StringConverter
+import javafx.util.converter.DoubleStringConverter
 import javafx.util.converter.NumberStringConverter
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.net.MaterialRegistry
@@ -20,15 +23,21 @@ class Workbench : View() {
     private val from = SimpleIntegerProperty(400)
     private val to = SimpleIntegerProperty(1600)
     private val output = SimpleStringProperty()
-    private val registry = MaterialRegistry()
 
+    private val registry = MaterialRegistry()
     private val indexes = FXCollections.observableArrayList<MaterialReference>()
 
     init {
+        title = "Thin Film Calculator"
         registry.subscribe(indexes)
         layers.add(LayerModel(LayerModel.Ambient, 1.0, 1.0, indexes[0]))
         layers.add(LayerModel(LayerModel.Film, 200.0, 1.0, indexes[1]))
         layers.add(LayerModel(LayerModel.Substrate, 1.0, 1.0, indexes[2]))
+    }
+
+    override fun onUndock() {
+        super.onUndock()
+        registry.subscribe(indexes)
     }
 
     override val root = gridpane {
@@ -46,17 +55,27 @@ class Workbench : View() {
                     gridpaneColumnConstraints {
                         percentWidth = 50.0
                     }
-                    button("\uD83D\uDCDA").action {
-                        openInternalWindow(LibraryView(registry))
+                    button("\uD83D\uDCDA") {
+                        action {
+                            openInternalWindow(LibraryView(registry))
+                        }
+                        tooltip = tooltip("Open Library")
                     }
-                    button("➕").action {
-                        layers.add(
-                            layers.size - 1,
-                            LayerModel(LayerModel.Film, 1.0, 1.0, MaterialReference(registry, 0))
-                        )
+                    button("➕") {
+                        action {
+                            layers.add(
+                                layers.size - 1,
+                                LayerModel(LayerModel.Film, 1.0, 1.0, MaterialReference(registry, 0))
+                            )
+                        }
+                        tooltip = tooltip("Add Layer")
                     }
-                    textfield(from)
-                    textfield(to)
+                    textfield(from) {
+                        tooltip = tooltip("Lower point of wavelength domain range")
+                    }
+                    textfield(to) {
+                        tooltip = tooltip("Last point of wavelength domain range")
+                    }
                     button("Run") {
                         useMaxSize = true
                         useMaxWidth = true
@@ -74,6 +93,7 @@ class Workbench : View() {
                                 println("You have to define at least three layers")
                             }
                         }
+                        tooltip = tooltip("Start Experiment")
                     }
                 }
                 tableview(layers) {
@@ -83,6 +103,7 @@ class Workbench : View() {
                     useMaxWidth = true
                     isEditable = true
                     readonlyColumn("Type", LayerModel::typeProperty).cellFormat {
+                        alignment = Pos.BASELINE_CENTER
                         text = when (it.value) {
                             0 -> "Film"
                             1 -> "Ambient"
@@ -92,15 +113,15 @@ class Workbench : View() {
                     }
                     column("Depth (nm)", LayerModel::depthProperty) {
                         makeEditable()
-                        useTextField(NumberStringConverter()) {
-                            val element = it.rowValue
-                            if (element.type == LayerModel.Film) {
-                                text = element.depth.toString()
-                                isEditable = true
-                            } else isEditable = false
-                        }
+                        useTextField(NumberStringConverter())
                     }
-                    column("Fulfill", LayerModel::fulfillProperty).makeEditable()
+                    column("Fulfill", LayerModel::fulfillProperty) {
+                        makeEditable()
+                        useTextField(object : StringConverter<Number>() {
+                            override fun fromString(string: String?): Double = (string ?: "0").toDouble()
+                            override fun toString(double: Number?): String = double.toString()
+                        })
+                    }
                     column("Material", LayerModel::materialProperty) {
                         useComboBox(indexes)
                         remainingWidth()
@@ -128,7 +149,7 @@ class Workbench : View() {
                 }
             }
             vbox {
-                chart = linechart("Material n and k", NumberAxis(), NumberAxis()) {
+                chart = linechart("System Transmission/Reflection/Absorption", NumberAxis(), NumberAxis()) {
                     setCreateSymbols(false)
                 }
             }

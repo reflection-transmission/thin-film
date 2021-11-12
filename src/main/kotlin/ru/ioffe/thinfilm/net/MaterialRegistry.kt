@@ -6,7 +6,7 @@ import ru.ioffe.thinfilm.ui.databinding.MaterialReference
 
 class MaterialRegistry {
 
-    private val registry = mutableListOf<Material>()
+    private val registry = mutableMapOf<MaterialReference, Material>()
     private val subscribers = mutableListOf<ObservableList<MaterialReference>>()
 
     init {
@@ -17,37 +17,37 @@ class MaterialRegistry {
 
     fun add(material: Material) {
         if (!added(material)) {
-            registry.add(material)
-            subscribers.forEach { it.add(MaterialReference(this, registry.indexOf(material))) }
+            val reference = MaterialReference(this, registry.size)
+            registry[reference] = material
+            subscribers.forEach { it.add(reference) }
         }
     }
 
     fun remove(material: Material) {
         if (added(material)) {
-            subscribers.forEach { it.remove(registry.indexOf(material), registry.indexOf(material)) }
-            registry.remove(material)
+            val reference = reference(material)
+            subscribers.forEach { it.remove(reference) }
+            registry.remove(reference)
         }
     }
 
-    fun materials(): List<Material> {
-        return registry.toList()
-    }
-
-    fun get(index: Int): Material {
-        return materials()[index]
+    fun get(reference: MaterialReference): Material {
+        return registry[reference] ?: Material("Air", MaterialProperties.Constant(1.0))
     }
 
     fun subscribe(subscriber: ObservableList<MaterialReference>) {
-        subscriber.addAll(materials().map { MaterialReference(this, registry.indexOf(it)) })
+        subscriber.addAll(registry.keys)
         subscribers.add(subscriber)
     }
+
+    private fun reference(material: Material) = registry.filterValues { it == material }.keys.first()
 
     fun unsubscribe(subscriber: ObservableList<MaterialReference>) {
         subscribers.remove(subscriber)
     }
 
-    fun added(material: Material): Boolean {
-        return registry.contains(material)
+    private fun added(material: Material): Boolean {
+        return registry.containsValue(material)
     }
 
 }
