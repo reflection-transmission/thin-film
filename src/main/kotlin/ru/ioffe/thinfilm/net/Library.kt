@@ -11,11 +11,10 @@ import java.util.stream.Collectors
 
 class Library {
 
-    fun fetch(): Record {
-        val shelves = load("library.yml")
+    fun fetch(): List<Shelf> {
+        return load("library.yml")
             .clean()
             .parse(ListSerializer(Shelf.serializer()))
-        return Record(LocalDateTime.now(), shelves)
     }
 
     fun entry(page: Shelf.Book.Page): Entry {
