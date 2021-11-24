@@ -2,7 +2,10 @@ package ru.ioffe.thinfilm.core.model
 
 import ru.ioffe.thinfilm.net.MaterialProperties
 
-data class Material(val name: String, val properties: MaterialProperties = MaterialProperties.TabulatedN("1 1")) {
+sealed class Material(val name: String) {
+
+    abstract fun properties(): MaterialProperties
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -17,4 +20,11 @@ data class Material(val name: String, val properties: MaterialProperties = Mater
     override fun hashCode(): Int {
         return name.hashCode()
     }
+
+    class Defined(name: String, private val properties: MaterialProperties) : Material(name) {
+
+        override fun properties(): MaterialProperties = properties
+
+    }
+
 }

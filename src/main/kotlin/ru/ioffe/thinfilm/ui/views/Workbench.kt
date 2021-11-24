@@ -1,4 +1,4 @@
-package ru.ioffe.thinfilm.ui
+package ru.ioffe.thinfilm.ui.views
 
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleStringProperty
@@ -8,13 +8,12 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.paint.Color
 import javafx.util.StringConverter
-import javafx.util.converter.DoubleStringConverter
 import javafx.util.converter.NumberStringConverter
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.net.MaterialRegistry
+import ru.ioffe.thinfilm.ui.Experiment
 import ru.ioffe.thinfilm.ui.databinding.LayerModel
 import ru.ioffe.thinfilm.ui.databinding.MaterialReference
-import ru.ioffe.thinfilm.ui.library.LibraryView
 import tornadofx.*
 
 class Workbench : View() {

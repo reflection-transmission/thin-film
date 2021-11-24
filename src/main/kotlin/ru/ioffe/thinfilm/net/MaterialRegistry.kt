@@ -10,9 +10,9 @@ class MaterialRegistry {
     private val subscribers = mutableListOf<ObservableList<MaterialReference>>()
 
     init {
-        add(Material("Air", MaterialProperties.Constant(1.0)))
-        add(Material("Constant 2.3", MaterialProperties.Constant(2.3)))
-        add(Material("Constant 1.5", MaterialProperties.Constant(1.5)))
+        add(Material.Defined("Air", MaterialProperties.Constant(1.0)))
+        add(Material.Defined("Constant 2.3", MaterialProperties.Constant(2.3)))
+        add(Material.Defined("Constant 1.5", MaterialProperties.Constant(1.5)))
     }
 
     fun add(material: Material) {
@@ -32,7 +32,7 @@ class MaterialRegistry {
     }
 
     fun get(reference: MaterialReference): Material {
-        return registry[reference] ?: Material("Air", MaterialProperties.Constant(1.0))
+        return registry[reference] ?: Material.Defined("Air", MaterialProperties.Constant(1.0))
     }
 
     fun subscribe(subscriber: ObservableList<MaterialReference>) {

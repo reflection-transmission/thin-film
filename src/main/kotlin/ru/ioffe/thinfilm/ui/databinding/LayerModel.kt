@@ -1,14 +1,17 @@
 package ru.ioffe.thinfilm.ui.databinding
 
-import javafx.beans.property.SimpleBooleanProperty
-import javafx.beans.property.SimpleDoubleProperty
-import javafx.beans.property.SimpleIntegerProperty
-import javafx.beans.property.SimpleObjectProperty
+import javafx.beans.property.*
 import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.net.MaterialRegistry
 import tornadofx.*
 
-class LayerModel(type: Int, depth: Double, fulfill: Double, material: MaterialReference, enabled: Boolean = true) {
+class LayerModel(
+    type: Int,
+    depth: Double,
+    fulfill: Double,
+    material: MaterialReference,
+    enabled: Boolean = true
+) {
 
     companion object {
         const val Ambient = 1
@@ -31,6 +34,7 @@ class LayerModel(type: Int, depth: Double, fulfill: Double, material: MaterialRe
     val enabledProperty = SimpleBooleanProperty(enabled)
     var enabled by enabledProperty
 
-    fun layer(registry: MaterialRegistry): Layer = Layer(registry.get(material).properties, depth, fulfill, enabled)
+    fun layer(registry: MaterialRegistry): Layer =
+        Layer(registry.get(material).properties(), depth, enabled, fulfill)
 
 }

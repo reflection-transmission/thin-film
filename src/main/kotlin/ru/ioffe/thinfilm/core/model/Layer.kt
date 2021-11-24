@@ -13,21 +13,34 @@ import kotlin.math.sin
 class Layer(
     val properties: MaterialProperties,
     private val depth: Double,
+    val enabled: Boolean,
     private val fulfill: Double,
-    val enabled: Boolean
+    private val profile: Map<Double, Double> = mapOf(Pair(1.0, 1.0))
 ) {
 
-    private fun phi(wavelength: Double): Double =
+    private fun phi(wavelength: Double, depth: Double): Double =
         2 * PI * properties.n(wavelength) * depth * 10.0.pow(-9) / (wavelength * 10.0.pow(-6))
 
     fun m(wavelength: Double): FieldMatrix<Complex> {
-        val a = Complex(cos(phi(wavelength)))
-        val b = Complex(0.0, sin(phi(wavelength)) / n(wavelength))
-        val c = Complex(0.0, sin(phi(wavelength)) * n(wavelength))
-        val d = Complex(cos(phi(wavelength)))
-        return MatrixUtils.createFieldMatrix(arrayOf(arrayOf(a, b), arrayOf(c, d)))
+        var m = identityMatrix()
+        var previous = 0.0
+        for (point in profile.keys.sorted()) {
+            val part = depth * point - previous
+            previous = part
+            val phi = phi(wavelength, part)
+            val n = n(wavelength, profile[point]!!)
+            val a = Complex(cos(phi))
+            val b = Complex(0.0, sin(phi) / n)
+            val c = Complex(0.0, sin(phi) * n)
+            val d = Complex(cos(phi))
+            m = m.multiply(MatrixUtils.createFieldMatrix(arrayOf(arrayOf(a, b), arrayOf(c, d))))
+        }
+        return m
     }
 
-    private fun n(wavelength: Double) = Optics().effectiveIndex(properties.n(wavelength), 1.0, fulfill)
+    private fun identityMatrix() =
+        MatrixUtils.createFieldMatrix(arrayOf(arrayOf(Complex(1.0), Complex(0.0)), arrayOf(Complex(0.0), Complex(1.0))))
+
+    private fun n(wavelength: Double, fulfill: Double) = Optics().effectiveIndex(properties.n(wavelength), 1.0, fulfill)
 
 }

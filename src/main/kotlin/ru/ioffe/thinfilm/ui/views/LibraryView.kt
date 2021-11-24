@@ -1,4 +1,4 @@
-package ru.ioffe.thinfilm.ui.library
+package ru.ioffe.thinfilm.ui.views
 
 import javafx.collections.FXCollections
 import javafx.geometry.Pos
@@ -25,7 +25,7 @@ class LibraryView(private val registry: MaterialRegistry) : View() {
     init {
         title = "RefractiveIndex.info Library"
         registry.subscribe(selected)
-        selected.removeIf { registry.get(it).properties is MaterialProperties.Constant }
+        selected.removeIf { registry.get(it).properties() is MaterialProperties.Constant }
     }
 
     override fun onUndock() {
@@ -81,21 +81,26 @@ class LibraryView(private val registry: MaterialRegistry) : View() {
 
     private fun draw(chart: LineChart<Number, Number>, value: Any?, add: Button) {
         chart.data.clear()
+        lateinit var material: MaterialProperties
         if (value is Shelf.Book.Page) {
-            val material = material(value)
-            val entry = Material(value.name, material)
-            chart.series("n") {
-                material.wavelengths().forEach {
-                    data(it, material.n(it))
-                }
-            }
-            chart.series("k") {
-                material.wavelengths().forEach {
-                    data(it, material.k(it))
-                }
-            }
+            material = material(value)
+            val entry = Material.Defined(value.name, material)
             add.action {
                 registry.add(entry)
+            }
+        } else if (value is MaterialReference) {
+            material = registry.get(value).properties()
+        } else {
+            return
+        }
+        chart.series("n") {
+            material.wavelengths().forEach {
+                data(it, material.n(it))
+            }
+        }
+        chart.series("k") {
+            material.wavelengths().forEach {
+                data(it, material.k(it))
             }
         }
     }
