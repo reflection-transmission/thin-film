@@ -40,7 +40,7 @@ class Result(private val spectrum: Spectrum) {
 
     fun out(property: SimpleStringProperty) {
         var result = "Wavelength Transmitted Reflected Absorbed \n"
-        spectrum.wavelengths.forEach { result += "${it.length} ${it.transmitted} ${it.reflected} ${it.absorbed()} \n" }
+        spectrum.wavelengths.forEach { if (!it.transmitted.isNaN() && !it.reflected.isNaN()) result += "${it.length} ${it.transmitted} ${it.reflected} ${it.absorbed()} \n" }
         property.set(result)
         clipboard(result)
     }
