@@ -1,23 +1,23 @@
-package ru.ioffe.thinfilm.ui.databinding
+package ru.ioffe.thinfilm.core.util
 
 import javafx.beans.property.SimpleIntegerProperty
-import ru.ioffe.thinfilm.net.MaterialRegistry
-import tornadofx.*
+import tornadofx.getValue
+import tornadofx.setValue
 
-class MaterialReference(private val origin: MaterialRegistry, id: Int) {
+class Reference<V>(private val origin: Registry<V>, id: Int) {
 
     private val property = SimpleIntegerProperty(id)
     var id by property
 
     override fun toString(): String {
-        return origin.get(this).name
+        return origin.get(this).toString()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as MaterialReference
+        other as Reference<*>
 
         if (id != other.id) return false
 
@@ -27,6 +27,5 @@ class MaterialReference(private val origin: MaterialRegistry, id: Int) {
     override fun hashCode(): Int {
         return id
     }
-
 
 }

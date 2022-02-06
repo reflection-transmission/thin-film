@@ -9,28 +9,28 @@ import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.paint.Color
 import ru.ioffe.thinfilm.core.model.Material
+import ru.ioffe.thinfilm.core.util.Reference
+import ru.ioffe.thinfilm.core.util.ThinFilmContext
 import ru.ioffe.thinfilm.net.Library
 import ru.ioffe.thinfilm.net.MaterialProperties
-import ru.ioffe.thinfilm.net.MaterialRegistry
 import ru.ioffe.thinfilm.net.Shelf
-import ru.ioffe.thinfilm.ui.databinding.MaterialReference
 import tornadofx.*
 
-class LibraryView(private val registry: MaterialRegistry) : View() {
+class LibraryView(private val context: ThinFilmContext) : View() {
 
     private val library = Library()
     private val record = library.fetch()
-    private val selected = FXCollections.observableArrayList<MaterialReference>()
+    private val selected = FXCollections.observableArrayList<Reference<Material>>()
 
     init {
         title = "RefractiveIndex.info Library"
-        registry.subscribe(selected)
-        selected.removeIf { registry.get(it).properties() is MaterialProperties.Constant }
+        context.materials().subscribe(selected)
+        selected.removeIf { context.materials().get(it).properties() is MaterialProperties.Constant }
     }
 
     override fun onUndock() {
         super.onUndock()
-        registry.subscribe(selected)
+        context.materials().subscribe(selected)
     }
 
     override val root = hbox {
@@ -56,7 +56,7 @@ class LibraryView(private val registry: MaterialRegistry) : View() {
         }
         val list = listview(selected) {
             cellFormat {
-                val item: Material = registry.get(this@cellFormat.item)
+                val item: Material = context.materials().get(this@cellFormat.item)
                 graphic = hbox(spacing = 5) {
                     alignment = Pos.BASELINE_LEFT
                     label(item.name)
@@ -65,7 +65,7 @@ class LibraryView(private val registry: MaterialRegistry) : View() {
                             backgroundColor += Color.TRANSPARENT
                         }
                         action {
-                            registry.remove(item)
+                            context.materials().remove(item)
                         }
                     }
                 }
@@ -86,10 +86,10 @@ class LibraryView(private val registry: MaterialRegistry) : View() {
             material = material(value)
             val entry = Material.Defined(value.name, material)
             add.action {
-                registry.add(entry)
+                context.materials().add(entry)
             }
-        } else if (value is MaterialReference) {
-            material = registry.get(value).properties()
+        } else if (value is Reference<*>) {
+            material = context.materials().get(value as Reference<Material>).properties()
         } else {
             return
         }

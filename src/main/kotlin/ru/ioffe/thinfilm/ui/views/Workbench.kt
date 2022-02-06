@@ -6,14 +6,20 @@ import javafx.collections.FXCollections
 import javafx.geometry.Pos
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
+import javafx.scene.control.Alert
+import javafx.scene.control.ButtonType
 import javafx.scene.paint.Color
+import javafx.stage.FileChooser.ExtensionFilter
 import javafx.util.StringConverter
 import javafx.util.converter.NumberStringConverter
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
-import ru.ioffe.thinfilm.net.MaterialRegistry
+import ru.ioffe.thinfilm.core.model.Material
+import ru.ioffe.thinfilm.core.util.Reference
+import ru.ioffe.thinfilm.core.util.ThinFilmContext
+import ru.ioffe.thinfilm.import.Import
+import ru.ioffe.thinfilm.ui.Drawable
 import ru.ioffe.thinfilm.ui.Experiment
 import ru.ioffe.thinfilm.ui.databinding.LayerModel
-import ru.ioffe.thinfilm.ui.databinding.MaterialReference
 import tornadofx.*
 
 class Workbench : View() {
@@ -22,13 +28,12 @@ class Workbench : View() {
     private val from = SimpleIntegerProperty(400)
     private val to = SimpleIntegerProperty(1600)
     private val output = SimpleStringProperty()
-
-    private val registry = MaterialRegistry()
-    private val indexes = FXCollections.observableArrayList<MaterialReference>()
+    private val context = ThinFilmContext()
+    private val indexes = FXCollections.observableArrayList<Reference<Material>>()
 
     init {
         title = "Thin Film Calculator"
-        registry.subscribe(indexes)
+        context.materials().subscribe(indexes)
         layers.add(LayerModel(LayerModel.Ambient, 1.0, 1.0, indexes[0]))
         layers.add(LayerModel(LayerModel.Film, 200.0, 1.0, indexes[1]))
         layers.add(LayerModel(LayerModel.Substrate, 1.0, 1.0, indexes[2]))
@@ -36,7 +41,7 @@ class Workbench : View() {
 
     override fun onUndock() {
         super.onUndock()
-        registry.subscribe(indexes)
+        context.materials().subscribe(indexes)
     }
 
     override val root = gridpane {
@@ -56,7 +61,7 @@ class Workbench : View() {
                     }
                     button("\uD83D\uDCDA") {
                         action {
-                            openInternalWindow(LibraryView(registry))
+                            openInternalWindow(LibraryView(context))
                         }
                         tooltip = tooltip("Open Library")
                     }
@@ -64,7 +69,7 @@ class Workbench : View() {
                         action {
                             layers.add(
                                 layers.size - 1,
-                                LayerModel(LayerModel.Film, 1.0, 1.0, MaterialReference(registry, 0))
+                                LayerModel(LayerModel.Film, 1.0, 1.0, Reference(context.materials(), 0))
                             )
                         }
                         tooltip = tooltip("Add Layer")
@@ -81,9 +86,9 @@ class Workbench : View() {
                         action {
                             if (layers.size > 2) {
                                 val result = Experiment(
-                                    layers.map { it.layer(registry) }.toMutableList(),
-                                    layers.first().layer(registry),
-                                    layers.last().layer(registry),
+                                    layers.map { it.layer(context.materials()) }.toMutableList(),
+                                    layers.first().layer(context.materials()),
+                                    layers.last().layer(context.materials()),
                                     WavelengthDomain(from.get(), to.get())
                                 ).start()
                                 result.draw(chart)
@@ -93,6 +98,26 @@ class Workbench : View() {
                             }
                         }
                         tooltip = tooltip("Start Experiment")
+                    }
+                    button("Import Data") {
+                        useMaxSize = true
+                        useMaxWidth = true
+                        action {
+                            val files = chooseFile(
+                                "Choose dataset",
+                                arrayOf(ExtensionFilter("oli", "*.oli")),
+                                mode = FileChooserMode.Multi
+                            )
+                            alert(
+                                Alert.AlertType.INFORMATION,
+                                header = "Select data type",
+                                title = "Select data type",
+                                buttons = arrayOf(ButtonType("Transmitted"), ButtonType("Reflected")),
+                                actionFn = {
+                                    val buttonName = it.text
+                                    files.forEach { Drawable(Import(buttonName == "Transmitted").apply(it)).draw(chart) }
+                                })
+                        }
                     }
                 }
                 tableview(layers) {

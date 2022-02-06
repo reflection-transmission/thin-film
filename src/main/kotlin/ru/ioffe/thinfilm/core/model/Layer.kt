@@ -11,10 +11,10 @@ import kotlin.math.pow
 import kotlin.math.sin
 
 class Layer(
-    val properties: MaterialProperties,
-    private val depth: Double,
-    val enabled: Boolean,
-    private val fulfill: Double,
+    val properties: MaterialProperties = MaterialProperties.Constant(1.0),
+    private val depth: Double = 1.0,
+    val enabled: Boolean = true,
+    private val fulfill: Double = 1.0,
     private val profile: Map<Double, Double> = mapOf(Pair(1.0, 1.0))
 ) {
 

@@ -2,14 +2,16 @@ package ru.ioffe.thinfilm.ui.databinding
 
 import javafx.beans.property.*
 import ru.ioffe.thinfilm.core.model.Layer
-import ru.ioffe.thinfilm.net.MaterialRegistry
+import ru.ioffe.thinfilm.core.model.Material
+import ru.ioffe.thinfilm.core.util.Reference
+import ru.ioffe.thinfilm.core.util.Registry
 import tornadofx.*
 
 class LayerModel(
     type: Int,
     depth: Double,
     fulfill: Double,
-    material: MaterialReference,
+    material: Reference<Material>,
     enabled: Boolean = true
 ) {
 
@@ -34,7 +36,7 @@ class LayerModel(
     val enabledProperty = SimpleBooleanProperty(enabled)
     var enabled by enabledProperty
 
-    fun layer(registry: MaterialRegistry): Layer =
+    fun layer(registry: Registry<Material>): Layer =
         Layer(registry.get(material).properties(), depth, enabled, fulfill)
 
 }

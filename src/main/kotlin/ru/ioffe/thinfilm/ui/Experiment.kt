@@ -16,10 +16,10 @@ class Experiment(
     private val wavelengths: WavelengthDomain = WavelengthDomain.default()
 ) {
 
-    fun start(): Result {
+    fun start(): Drawable {
         layers.removeLast()
         layers.removeFirst()
-        return Result(Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)))
+        return Drawable(Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)))
     }
 
     private fun substrate(it: Wavelength) = Substrate(substrate.properties, ambient.properties).apply(it)

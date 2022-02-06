@@ -8,32 +8,23 @@ import javafx.scene.input.ClipboardContent
 import ru.ioffe.thinfilm.core.model.Spectrum
 import tornadofx.*
 
-class Result(private val spectrum: Spectrum) {
+class Drawable(private val spectrum: Spectrum) {
 
     fun draw(chart: LineChart<Number, Number>) {
         invalidateChart(chart)
         chart.series("Transmitted") {
             spectrum.wavelengths.forEach {
-                if (!it.transmitted.isNaN()) data(
-                    it.length,
-                    it.transmitted
-                )
+                if (!it.transmitted.isNaN()) data(it.length, it.transmitted)
             }
         }
         chart.series("Reflected") {
             spectrum.wavelengths.forEach {
-                if (!it.reflected.isNaN()) data(
-                    it.length,
-                    it.reflected
-                )
+                if (!it.reflected.isNaN()) data(it.length, it.reflected)
             }
         }
         chart.series("Absorbed") {
             spectrum.wavelengths.forEach {
-                if (!it.absorbed().isNaN()) data(
-                    it.length,
-                    it.absorbed()
-                )
+                if (!it.absorbed().isNaN()) data(it.length, it.absorbed())
             }
         }
     }

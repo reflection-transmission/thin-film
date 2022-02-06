@@ -17,6 +17,8 @@ sealed class Material(val name: String) {
         return true
     }
 
+    override fun toString(): String = name
+
     override fun hashCode(): Int {
         return name.hashCode()
     }
