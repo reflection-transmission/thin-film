@@ -46,4 +46,6 @@ class Registry<T>(private val default: T, vararg content: T) {
         subscribers.remove(subscriber)
     }
 
+    fun values() : List<T> = registry.values.toList()
+
 }

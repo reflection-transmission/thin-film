@@ -10,13 +10,13 @@ import javafx.scene.control.TreeView
 import javafx.scene.paint.Color
 import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.core.util.Reference
-import ru.ioffe.thinfilm.core.util.ThinFilmContext
+import ru.ioffe.thinfilm.core.util.ExperimentContext
 import ru.ioffe.thinfilm.net.Library
 import ru.ioffe.thinfilm.net.MaterialProperties
 import ru.ioffe.thinfilm.net.Shelf
 import tornadofx.*
 
-class LibraryView(private val context: ThinFilmContext) : View() {
+class LibraryView(private val context: ExperimentContext) : View() {
 
     private val library = Library()
     private val record = library.fetch()

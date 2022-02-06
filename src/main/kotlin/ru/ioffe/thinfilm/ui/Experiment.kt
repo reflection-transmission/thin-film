@@ -3,23 +3,30 @@ package ru.ioffe.thinfilm.ui
 import org.apache.commons.math3.complex.Complex
 import org.apache.commons.math3.linear.FieldMatrix
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
-import ru.ioffe.thinfilm.core.model.Layer
-import ru.ioffe.thinfilm.core.model.Spectrum
-import ru.ioffe.thinfilm.core.model.Substrate
-import ru.ioffe.thinfilm.core.model.Wavelength
+import ru.ioffe.thinfilm.core.model.*
+import ru.ioffe.thinfilm.core.util.ExperimentContext
 import kotlin.math.pow
 
 class Experiment(
+    private val context: ExperimentContext,
     private val layers: MutableList<Layer>,
     private val ambient: Layer,
     private val substrate: Layer,
     private val wavelengths: WavelengthDomain = WavelengthDomain.default()
 ) {
 
-    fun start(): Drawable {
+    fun start() {
         layers.removeLast()
         layers.removeFirst()
-        return Drawable(Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)))
+        context.spectrums().add(
+            ExperimentSeries(
+                Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)),
+                "series",
+                enabled = true,
+                imported = false
+            )
+        )
+        context.refresh()
     }
 
     private fun substrate(it: Wavelength) = Substrate(substrate.properties, ambient.properties).apply(it)
