@@ -169,6 +169,7 @@ class Workbench : View() {
                 }
                 chart = linechart("System Transmission/Reflection/Absorption", NumberAxis(), NumberAxis()) {
                     createSymbols = false
+                    animated = false
                 }
                 context.hooks().add(TextHook(output))
                 context.hooks().add(ChartHook(chart))
