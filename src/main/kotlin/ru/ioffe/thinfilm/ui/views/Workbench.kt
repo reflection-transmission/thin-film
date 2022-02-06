@@ -100,22 +100,19 @@ class Workbench : View() {
                 button("Import Data") {
                     useMaxWidth = true
                     action {
-                        val files = chooseFile(
+                        chooseFile(
                             "Choose dataset",
                             arrayOf(ExtensionFilter("oli", "*.oli")),
                             mode = FileChooserMode.Multi
-                        )
-                        alert(
-                            Alert.AlertType.INFORMATION,
-                            header = "Select data type",
-                            title = "Select data type",
-                            buttons = arrayOf(ButtonType("Transmitted"), ButtonType("Reflected")),
-                            actionFn = {
-                                val buttonName = it.text
-                                files.forEach {
-                                    Import(context, buttonName == "Transmitted").apply(it)
-                                }
-                            })
+                        ).forEach { file ->
+                            alert(
+                                Alert.AlertType.INFORMATION,
+                                header = "Select data type for file ${file.name}",
+                                title = "Select data type",
+                                buttons = arrayOf(ButtonType("Transmitted"), ButtonType("Reflected")),
+                                actionFn = { alert -> Import(context, alert.text == "Transmitted").apply(file) })
+                        }
+
                     }
                 }
             }
@@ -183,9 +180,10 @@ class Workbench : View() {
                         graphic = hbox(spacing = 5) {
                             alignment = Pos.BASELINE_LEFT
                             label(item.toString())
-                            button("\uD83D\uDC41") {
-                                style {
-                                    backgroundColor += Color.TRANSPARENT
+                            togglebutton("\uD83D\uDC41") {
+                                action {
+                                    item.value().enabledProperty.set(isSelected)
+                                    context.refresh()
                                 }
                             }
                         }

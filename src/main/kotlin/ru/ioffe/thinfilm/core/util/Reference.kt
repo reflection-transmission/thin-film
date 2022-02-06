@@ -9,9 +9,9 @@ class Reference<V>(private val origin: Registry<V>, id: Int) {
     private val property = SimpleIntegerProperty(id)
     var id by property
 
-    override fun toString(): String {
-        return origin.get(this).toString()
-    }
+    override fun toString(): String = origin.get(this).toString()
+
+    fun value(): V = origin.get(this)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
