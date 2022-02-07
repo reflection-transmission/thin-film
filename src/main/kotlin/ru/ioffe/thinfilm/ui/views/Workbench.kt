@@ -181,7 +181,7 @@ class Workbench : View() {
                         graphic = hbox(spacing = 5) {
                             alignment = Pos.BASELINE_LEFT
                             label(item.toString())
-                            togglebutton("\uD83D\uDC41") {
+                            togglebutton("\uD83D\uDC41", selectFirst = item.value().enabled) {
                                 action {
                                     item.value().enabledProperty.set(isSelected)
                                     context.refresh()
