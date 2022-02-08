@@ -13,7 +13,16 @@ class Import(private val context: ExperimentContext, private val transmitted: Bo
         val lines = file.useLines { it.toList() }
         val data = lines.subList(lines.indexOf("<Data>") + 1, lines.indexOf("<EndData>"))
         val spectrum = Spectrum(Layer(), data.map(this::wavelength))
-        context.spectrums().add(ExperimentSeries(spectrum, file.name, enabled = true, imported = true))
+        context.spectrums().add(
+            ExperimentSeries(
+                spectrum, file.name,
+                enabled = true,
+                imported = true,
+                transmission = transmitted,
+                reflection = !transmitted,
+                absorption = false
+            )
+        )
         context.refresh()
     }
 

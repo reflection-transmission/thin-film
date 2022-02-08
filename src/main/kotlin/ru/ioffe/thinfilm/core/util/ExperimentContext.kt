@@ -20,11 +20,14 @@ class ExperimentContext {
         default = ExperimentSeries(
             Spectrum(Layer(), emptyList()), "default",
             enabled = false,
-            imported = false
+            imported = false,
+            transmission = true,
+            reflection = true,
+            absorption = true
         )
     )
 
-    private val hooks = mutableListOf<Consumer<List<Spectrum>>>()
+    private val hooks = mutableListOf<Consumer<List<ExperimentSeries>>>()
 
     fun materials() = materials
 
@@ -34,7 +37,7 @@ class ExperimentContext {
 
     fun refresh() {
         hooks.forEach { action ->
-            action.accept(spectrums.values().filter(ExperimentSeries::enabled).map(ExperimentSeries::spectrum))
+            action.accept(spectrums.values().filter(ExperimentSeries::enabled))
         }
     }
 

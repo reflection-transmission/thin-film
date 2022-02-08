@@ -23,7 +23,10 @@ class Experiment(
                 Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)),
                 "series",
                 enabled = true,
-                imported = false
+                imported = false,
+                transmission = true,
+                reflection = true,
+                absorption = false
             )
         )
         context.refresh()

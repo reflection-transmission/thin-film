@@ -187,6 +187,34 @@ class Workbench : View() {
                                     context.refresh()
                                 }
                             }
+                            togglebutton("T", selectFirst = item.value().transmission) {
+                                action {
+                                    item.value().transmissionProperty.set(isSelected)
+                                    context.refresh()
+                                }
+                            }
+                            togglebutton("R", selectFirst = item.value().reflection) {
+                                action {
+                                    item.value().reflectionProperty.set(isSelected)
+                                    context.refresh()
+                                }
+                            }
+                            togglebutton("A", selectFirst = item.value().absorption) {
+                                action {
+                                    item.value().absorptionProperty.set(isSelected)
+                                    context.refresh()
+                                }
+                            }
+                            button("❌") {
+                                alignment = Pos.BASELINE_RIGHT
+                                style {
+                                    backgroundColor += Color.TRANSPARENT
+                                }
+                                action {
+                                    context.spectrums().remove(item.value())
+                                    context.refresh()
+                                }
+                            }
                         }
                     }
                 }
