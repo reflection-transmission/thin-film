@@ -12,9 +12,11 @@ import java.util.stream.Collectors
 class Library {
 
     fun fetch(): List<Shelf> {
-        return load("library.yml")
+        val library = load("library.yml")
             .clean()
             .parse(ListSerializer(Shelf.serializer()))
+        library.flatMap(Shelf::content).forEach { book -> book.content.forEach { it.book = book.name } }
+        return library
     }
 
     fun entry(page: Shelf.Book.Page): Entry {

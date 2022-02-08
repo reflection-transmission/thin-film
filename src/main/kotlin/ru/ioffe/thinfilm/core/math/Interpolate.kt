@@ -8,8 +8,8 @@ class Interpolate {
         return try {
             val closest = Closest(xs).forValue(wavelength)
             val function = SplineInterpolator().interpolate(
-                xs.copyOfRange(closest - 2, closest + 2),
-                ys.copyOfRange(closest - 2, closest + 2)
+                xs.copyOfRange(closest - 1, closest + 1),
+                ys.copyOfRange(closest - 1, closest + 1)
             )
             function.value(wavelength)
         } catch (e: Exception) {

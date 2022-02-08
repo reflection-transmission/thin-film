@@ -15,13 +15,13 @@ class Experiment(
     private val wavelengths: WavelengthDomain = WavelengthDomain.default()
 ) {
 
-    fun start() {
+    fun start(name: String) {
         layers.removeLast()
         layers.removeFirst()
         context.spectrums().add(
             ExperimentSeries(
                 Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)),
-                "series",
+                name,
                 enabled = true,
                 imported = false,
                 transmission = true,

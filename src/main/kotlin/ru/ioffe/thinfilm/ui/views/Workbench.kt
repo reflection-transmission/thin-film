@@ -90,7 +90,7 @@ class Workbench : View() {
                                 layers.first().layer(context.materials()),
                                 layers.last().layer(context.materials()),
                                 WavelengthDomain(from.get(), to.get())
-                            ).start()
+                            ).start("custom series")
                         } else {
                             println("You have to define at least three layers")
                         }

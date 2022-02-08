@@ -29,8 +29,10 @@ class Shelf(@SerialName("SHELF") val shelf: String, val name: String, val conten
             val info: String = ""
         ) {
 
+            var book: String = ""
+
             override fun toString(): String {
-                return name
+                return "$book $name"
             }
 
         }

@@ -84,7 +84,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
         lateinit var material: MaterialProperties
         if (value is Shelf.Book.Page) {
             material = material(value)
-            val entry = Material.Defined(value.name, material)
+            val entry = Material.Defined(value.toString(), material)
             add.action {
                 context.materials().add(entry)
             }
