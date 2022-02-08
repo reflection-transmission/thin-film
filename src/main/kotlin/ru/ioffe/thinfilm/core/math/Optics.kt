@@ -14,9 +14,7 @@ class Optics {
     }
 
     fun buger(depth: Double, n: Double, k: Double, wavelength: Double): Double =
-        Math.E.pow(-depth * absorption(n, k, wavelength))
-
-    private fun absorption(n: Double, k: Double, wavelength: Double): Double = 4 * Math.PI * n * k / wavelength
+        Math.E.pow(-1 * depth * (4 * Math.PI * n * k / wavelength))
 
     fun fresnelTransmission(wavelength: Wavelength, n1: Double, n2: Double): Wavelength {
         val theta1 = wavelength.angle

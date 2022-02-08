@@ -17,12 +17,7 @@ class Substrate(
             substrate.depth * 10.0.pow(-9),
             substrate.properties.n(incoming.length),
             substrate.properties.k(incoming.length),
-            incoming.length
-        )
-        val filmToSubstrate = optics.fresnelTransmission(
-            incoming,
-            previous.n(incoming.length),
-            substrate.properties.n(incoming.length)
+            incoming.length * 10.0.pow(-6)
         )
         val substrateToFilm = optics.fresnelTransmission(
             incoming,
@@ -34,12 +29,10 @@ class Substrate(
             substrate.properties.n(incoming.length),
             ambient.n(incoming.length)
         )
-        val t1 = filmToSubstrate.transmitted
-        val t2 = t1 * extinction * substrateToAmbient.transmitted
-        val r1 = filmToSubstrate.reflected
-        val r2 = t1 * extinction * substrateToAmbient.reflected * extinction * substrateToFilm.transmitted
-        val t = t2 * incoming.transmitted
-        val r = incoming.reflected + incoming.transmitted * (r1 + r2)
+        println("transmitted: ${incoming.transmitted} EXTINCTION: ${extinction}, transmision: ${substrateToAmbient.transmitted}")
+        val t = incoming.transmitted * extinction * substrateToAmbient.transmitted
+        val r =
+            incoming.reflected + incoming.transmitted * substrateToAmbient.reflected * extinction.pow(2) * substrateToFilm.transmitted
         return Wavelength(incoming.length, substrateToAmbient.angle, t, r, incoming.polarization)
     }
 
