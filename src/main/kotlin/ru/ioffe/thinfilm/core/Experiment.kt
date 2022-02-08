@@ -1,4 +1,4 @@
-package ru.ioffe.thinfilm.ui
+package ru.ioffe.thinfilm.core
 
 import org.apache.commons.math3.complex.Complex
 import org.apache.commons.math3.linear.FieldMatrix
@@ -29,7 +29,7 @@ class Experiment(
         context.refresh()
     }
 
-    private fun substrate(it: Wavelength) = Substrate(substrate.properties, ambient.properties).apply(it)
+    private fun substrate(it: Wavelength) = Substrate(layers.last().properties, substrate, ambient.properties).apply(it)
 
     private fun film(it: Wavelength) = Wavelength(
         it.length,

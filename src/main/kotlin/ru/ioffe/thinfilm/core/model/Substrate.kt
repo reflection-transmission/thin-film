@@ -2,18 +2,45 @@ package ru.ioffe.thinfilm.core.model
 
 import ru.ioffe.thinfilm.core.math.Optics
 import ru.ioffe.thinfilm.net.MaterialProperties
+import kotlin.math.pow
 
-class Substrate(private val material: MaterialProperties, private val ambient: MaterialProperties) {
+class Substrate(
+    private val previous: MaterialProperties,
+    private val substrate: Layer,
+    private val ambient: MaterialProperties
+) {
 
-    fun apply(wavelength: Wavelength): Wavelength {
-        val f = Optics().fresnelTransmission(wavelength, material.n(wavelength.length), ambient.n(wavelength.length))
-        val t1 = f.transmitted
-        val t2 = wavelength.transmitted
-        val r1 = f.reflected
-        val r2 = wavelength.reflected
-        val r = r1 + t1 * r2 * t1 + t1 * r2 * r1 * r2 * t1
-        val t = t1 * (t2 + r2 * r1 * t2 + r2 * r1 * r2 * r1 * t2)
-        return Wavelength(wavelength.length, f.angle, t, r, wavelength.polarization)
+    private val optics = Optics()
+
+    fun apply(incoming: Wavelength): Wavelength {
+        val extinction = optics.buger(
+            substrate.depth * 10.0.pow(-9),
+            substrate.properties.n(incoming.length),
+            substrate.properties.k(incoming.length),
+            incoming.length
+        )
+        val filmToSubstrate = optics.fresnelTransmission(
+            incoming,
+            previous.n(incoming.length),
+            substrate.properties.n(incoming.length)
+        )
+        val substrateToFilm = optics.fresnelTransmission(
+            incoming,
+            substrate.properties.n(incoming.length),
+            previous.n(incoming.length)
+        )
+        val substrateToAmbient = optics.fresnelTransmission(
+            incoming,
+            substrate.properties.n(incoming.length),
+            ambient.n(incoming.length)
+        )
+        val t1 = filmToSubstrate.transmitted
+        val t2 = t1 * extinction * substrateToAmbient.transmitted
+        val r1 = filmToSubstrate.reflected
+        val r2 = t1 * extinction * substrateToAmbient.reflected * extinction * substrateToFilm.transmitted
+        val t = t2 * incoming.transmitted
+        val r = incoming.reflected + incoming.transmitted * (r1 + r2)
+        return Wavelength(incoming.length, substrateToAmbient.angle, t, r, incoming.polarization)
     }
 
 }

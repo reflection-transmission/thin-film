@@ -13,6 +13,11 @@ class Optics {
         return sqrt(a + sqrt(a.pow(2) + e1 * e1 * e2 * e2))
     }
 
+    fun buger(depth: Double, n: Double, k: Double, wavelength: Double): Double =
+        Math.E.pow(-depth * absorption(n, k, wavelength))
+
+    private fun absorption(n: Double, k: Double, wavelength: Double): Double = 4 * Math.PI * n * k / wavelength
+
     fun fresnelTransmission(wavelength: Wavelength, n1: Double, n2: Double): Wavelength {
         val theta1 = wavelength.angle
         val theta2 = snelliusAngle(theta1, n1, n2)
