@@ -6,16 +6,33 @@ import kotlin.math.*
 
 class Optics {
 
-    private fun snelliusAngle(theta1: Double, n1: Double, n2: Double) = asin(sin(theta1) * n1 / n2)
-
+    /**
+     * Calculates effective refraction index according to Odelevsky formula
+     * @param e1 medium refractive index
+     * @param e2 ambient refractive index
+     * @param volume fulfill coefficient
+     */
     fun effectiveIndex(e1: Double, e2: Double, volume: Double): Double {
         val a = (volume - 0.5) * (e1 * e1 - e2 * e2)
         return sqrt(a + sqrt(a.pow(2) + e1 * e1 * e2 * e2))
     }
 
+    /**
+     * Calculates buger extinction coefficient
+     * @param depth depth in <b>meters</b> (e.g. 200*10.0.pow(-9) for 200 nm depth)
+     * @param n real part of complex refractive index
+     * @param k imaginary part of complex refractive index
+     * @param wavelength vacuum wavelength
+     */
     fun buger(depth: Double, n: Double, k: Double, wavelength: Double): Double =
         Math.E.pow(-1 * depth * (4 * Math.PI * n * k / wavelength))
 
+    /**
+     * Calculates transmission and reflection coefficients with Fresnel formulas, stores it in Wavelength object.
+     * @param wavelength original Wavelength object
+     * @param n1 first refraction index
+     * @param n2 second refraction index
+     */
     fun fresnelTransmission(wavelength: Wavelength, n1: Double, n2: Double): Wavelength {
         val theta1 = wavelength.angle
         val theta2 = snelliusAngle(theta1, n1, n2)
@@ -38,5 +55,6 @@ class Optics {
     private fun reflection(n1: Double, n2: Double, theta1: Double, theta2: Double) =
         ((n1 * cos(theta1) - n2 * cos(theta2)) / (n1 * cos(theta1) + n2 * cos(theta2))).pow(2)
 
+    private fun snelliusAngle(theta1: Double, n1: Double, n2: Double) = asin(sin(theta1) * n1 / n2)
 
 }

@@ -29,8 +29,10 @@ class Substrate(
             substrate.properties.n(incoming.length),
             ambient.n(incoming.length)
         )
-        println("transmitted: ${incoming.transmitted} EXTINCTION: ${extinction}, transmision: ${substrateToAmbient.transmitted}")
-        val t = incoming.transmitted * extinction * substrateToAmbient.transmitted
+        val t1 = incoming.transmitted * extinction * substrateToAmbient.transmitted
+        val t2 =
+            incoming.transmitted * extinction * substrateToAmbient.reflected * extinction * substrateToFilm.reflected * extinction * substrateToAmbient.transmitted
+        val t = t1 + t2
         val r =
             incoming.reflected + incoming.transmitted * substrateToAmbient.reflected * extinction.pow(2) * substrateToFilm.transmitted
         return Wavelength(incoming.length, substrateToAmbient.angle, t, r, incoming.polarization)

@@ -4,12 +4,15 @@ import org.apache.commons.math3.analysis.interpolation.SplineInterpolator
 
 class Interpolate {
 
+    /**
+     * Returns interpolated value y for passed wavelength value using xs and ys points.
+     */
     fun value(xs: DoubleArray, ys: DoubleArray, wavelength: Double): Double {
         return try {
             val closest = Closest(xs).forValue(wavelength)
             val function = SplineInterpolator().interpolate(
-                xs.copyOfRange(closest - 1, closest + 1),
-                ys.copyOfRange(closest - 1, closest + 1)
+                xs.copyOfRange(closest - 1, closest + 2),
+                ys.copyOfRange(closest - 1, closest + 2)
             )
             function.value(wavelength)
         } catch (e: Exception) {
