@@ -83,7 +83,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
             draw(chart, newValue, add)
         }
         tree.selectionModel.selectedItemProperty().addListener { _, _, newValue ->
-            draw(chart, newValue.value, add)
+            if (newValue != null) draw(chart, newValue.value, add)
         }
     }
 
