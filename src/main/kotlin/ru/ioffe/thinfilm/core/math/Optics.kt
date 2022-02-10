@@ -18,7 +18,7 @@ class Optics {
     }
 
     /**
-     * Calculates buger extinction coefficient
+     * Calculates Buger extinction coefficient
      * @param depth depth in <b>meters</b> (e.g. 200*10.0.pow(-9) for 200 nm depth)
      * @param n real part of complex refractive index
      * @param k imaginary part of complex refractive index

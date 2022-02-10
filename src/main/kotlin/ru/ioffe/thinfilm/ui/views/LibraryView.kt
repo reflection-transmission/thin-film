@@ -1,5 +1,6 @@
 package ru.ioffe.thinfilm.ui.views
 
+import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.geometry.Pos
 import javafx.scene.chart.LineChart
@@ -19,6 +20,7 @@ import tornadofx.*
 class LibraryView(private val context: ExperimentContext) : View() {
 
     private val library = Library()
+    private val search = SimpleStringProperty("")
     private val record = library.fetch()
     private val selected = FXCollections.observableArrayList<Reference<Material>>()
 
@@ -34,14 +36,20 @@ class LibraryView(private val context: ExperimentContext) : View() {
     }
 
     override val root = hbox {
+        lateinit var tree: TreeView<Any>
+        lateinit var add: Button
+        lateinit var chart: LineChart<Number, Number>
         style {
             padding = box(5.px)
         }
-        val tree = treeview<Any> {
-            configure()
+        vbox(spacing = 5) {
+            textfield(search) {
+                promptText = "Search..."
+            }
+            tree = treeview {
+                configure()
+            }
         }
-        lateinit var add: Button
-        lateinit var chart: LineChart<Number, Number>
         vbox {
             style {
                 padding = box(0.px, 5.px)
@@ -107,6 +115,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
 
     private fun TreeView<Any>.configure() {
         root = TreeItem("Library")
+
         cellFormat {
             text = when (it) {
                 is String -> it
@@ -116,11 +125,26 @@ class LibraryView(private val context: ExperimentContext) : View() {
                 else -> throw IllegalArgumentException("Incorrect type for tree viewer")
             }
         }
+        search.addListener { _, _, _ ->
+            invalidate()
+        }
+        invalidate()
+    }
+
+    private fun TreeView<Any>.invalidate() {
         populate { parent ->
             val value = parent.value
-            if (parent == root) record
-            else if (value is Shelf) value.content
-            else if (value is Shelf.Book) value.content
+            if (parent == root) {
+                parent.isExpanded = true
+                record
+            } else if (value is Shelf) {
+                val filtered = value.content.filter { it.name.lowercase().contains(search.value.lowercase()) }
+                if (search.value != "") parent.isExpanded = true
+                filtered.ifEmpty {
+                    parent.removeFromParent()
+                    null
+                }
+            } else if (value is Shelf.Book) value.content
             else null
         }
     }
