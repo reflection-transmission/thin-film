@@ -1,10 +1,9 @@
-package ru.ioffe.thinfilm.import
+package ru.ioffe.thinfilm.core.util
 
 import ru.ioffe.thinfilm.core.model.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.core.model.Spectrum
 import ru.ioffe.thinfilm.core.model.Wavelength
-import ru.ioffe.thinfilm.core.util.ExperimentContext
 import java.io.File
 
 class Import(private val context: ExperimentContext, private val transmitted: Boolean = false) {

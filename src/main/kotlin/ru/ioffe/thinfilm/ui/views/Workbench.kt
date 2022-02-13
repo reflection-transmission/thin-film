@@ -18,7 +18,7 @@ import ru.ioffe.thinfilm.core.model.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.core.util.Reference
 import ru.ioffe.thinfilm.core.util.ExperimentContext
-import ru.ioffe.thinfilm.import.Import
+import ru.ioffe.thinfilm.core.util.Import
 import ru.ioffe.thinfilm.core.Experiment
 import ru.ioffe.thinfilm.ui.databinding.LayerModel
 import ru.ioffe.thinfilm.ui.views.hooks.ChartHook

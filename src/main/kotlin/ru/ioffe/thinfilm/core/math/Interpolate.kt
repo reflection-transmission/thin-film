@@ -8,38 +8,16 @@ class Interpolate {
      * Returns interpolated value y for passed wavelength value using xs and ys points.
      */
     fun value(xs: DoubleArray, ys: DoubleArray, wavelength: Double): Double {
+        val closest = Closest(xs).forValue(wavelength)
         return try {
-            val closest = Closest(xs).forValue(wavelength)
             val function = SplineInterpolator().interpolate(
-                xs.copyOfRange(closest - 1, closest + 2),
-                ys.copyOfRange(closest - 1, closest + 2)
+                xs.copyOfRange(closest - 2, closest + 2),
+                ys.copyOfRange(closest - 2, closest + 2)
             )
             function.value(wavelength)
         } catch (e: Exception) {
-            println(e)
-            0.0
+            ys[closest]
         }
-    }
-
-    private class Closest(private val domain: DoubleArray) {
-
-        fun forValue(value: Double): Int {
-            var low = 0
-            var high = domain.size - 1
-            var mid = 0
-            while (low < high) {
-                mid = (low + high) / 2
-                val midValue = domain[mid]
-                if (midValue == value) {
-                    return mid
-                } else {
-                    if (high - low == 1) return if (value > (domain[high] + domain[low]) / 2) high else low
-                    if (midValue > value) high = mid else low = mid
-                }
-            }
-            return mid
-        }
-
     }
 
 }

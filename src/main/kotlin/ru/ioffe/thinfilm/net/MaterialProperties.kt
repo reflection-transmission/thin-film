@@ -15,33 +15,23 @@ sealed class MaterialProperties {
     protected val dispersion = mutableMapOf<Double, Complex>()
 
     fun n(wavelength: Double): Double {
-        return if (dispersion.containsKey(wavelength)) {
-            dispersion[wavelength]!!.real
-        } else {
-            val res = Interpolate().value(
-                dispersion.keys.toDoubleArray(),
-                dispersion.values.map(Complex::getReal).toDoubleArray(),
-                wavelength
-            )
-            println("wavelength: $wavelength, n: $res")
-            res
-        }
+        return Interpolate().value(
+            dispersion.keys.toDoubleArray(),
+            dispersion.values.map(Complex::getReal).toDoubleArray(),
+            wavelength
+        )
     }
 
     fun k(wavelength: Double): Double {
-        return if (dispersion.containsKey(wavelength)) {
-            dispersion[wavelength]!!.imaginary
-        } else {
-            Interpolate().value(
-                dispersion.keys.toDoubleArray(),
-                dispersion.values.map(Complex::getImaginary).toDoubleArray(),
-                wavelength
-            )
-        }
+        return Interpolate().value(
+            dispersion.keys.toDoubleArray(),
+            dispersion.values.map(Complex::getImaginary).toDoubleArray(),
+            wavelength
+        )
     }
 
     fun complex(wavelength: Double): Complex {
-        return dispersion[wavelength] ?: Complex(0.0)
+        return dispersion[wavelength] ?: Complex(n(wavelength), -k(wavelength))
     }
 
     fun wavelengths(): List<Double> {
@@ -71,7 +61,7 @@ sealed class MaterialProperties {
                 val wavelength = split[i].toDouble()
                 val n = split[i + 1].trim().toDouble()
                 val k = split[i + 2].trim().toDouble()
-                dispersion[wavelength] = Complex(n, k)
+                dispersion[wavelength] = Complex(n, -k)
             }
         }
 
