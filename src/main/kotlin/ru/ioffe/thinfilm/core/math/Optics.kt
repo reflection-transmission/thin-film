@@ -35,7 +35,7 @@ class Optics {
      */
     fun fresnelTransmission(wavelength: Wavelength, n1: Double, n2: Double): Wavelength {
         val theta1 = wavelength.angle
-        val theta2 = snelliusAngle(theta1, n1, n2)
+        val theta2 = snellAngle(theta1, n1, n2)
         val tr = when (wavelength.polarization) {
             is Polarization.Normal -> transition(n2, n1, theta1, theta2)
             is Polarization.Parallel -> transition(n1, n2, theta1, theta2)
@@ -55,6 +55,6 @@ class Optics {
     private fun reflection(n1: Double, n2: Double, theta1: Double, theta2: Double) =
         ((n1 * cos(theta1) - n2 * cos(theta2)) / (n1 * cos(theta1) + n2 * cos(theta2))).pow(2)
 
-    private fun snelliusAngle(theta1: Double, n1: Double, n2: Double) = asin(sin(theta1) * n1 / n2)
+    private fun snellAngle(theta1: Double, n1: Double, n2: Double) = asin(sin(theta1) * n1 / n2)
 
 }
