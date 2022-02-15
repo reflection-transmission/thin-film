@@ -8,24 +8,26 @@ import kotlin.math.*
 
 class CharacteristicMatrix(private val layer: Layer) {
 
-    fun calculate(wavelength: Double): FieldMatrix<Complex> {
+    fun calculate(wavelength: Double): Array<Complex> {
         val m11 = Complex(
             cos(phi(wavelength)) * cosh(phiPrime(wavelength)),
             sin(phi(wavelength)) * sinh(phiPrime(wavelength))
         )
-        val m12 = Complex.I.multiply(Complex(
-            (n(wavelength) * paramA(wavelength) + k(wavelength) * paramB(wavelength)) / paramC(wavelength),
-            (k(wavelength) * paramA(wavelength) - n(wavelength) * paramB(wavelength)) / paramC(wavelength)
-        ))
-        val m21 = Complex.I.multiply(Complex(
-            n(wavelength) * paramA(wavelength) - k(wavelength) * paramB(wavelength),
-            -k(wavelength) * paramA(wavelength) - n(wavelength) * paramB(wavelength)
-        ))
+        val m12 = Complex(
+                (n(wavelength) * paramA(wavelength) + k(wavelength) * paramB(wavelength)) / paramC(wavelength),
+                (k(wavelength) * paramA(wavelength) - n(wavelength) * paramB(wavelength)) / paramC(wavelength)
+            )
+
+        val m21 = Complex(
+                n(wavelength) * paramA(wavelength) - k(wavelength) * paramB(wavelength),
+                -k(wavelength) * paramA(wavelength) - n(wavelength) * paramB(wavelength)
+            )
+
         val m22 = Complex(
             cos(phi(wavelength)) * cosh(phiPrime(wavelength)),
             sin(phi(wavelength)) * sinh(phiPrime(wavelength))
         )
-        return MatrixUtils.createFieldMatrix(arrayOf(arrayOf(m11, m12), arrayOf(m21, m22)))
+        return arrayOf(m11, m12, m21, m22)
     }
 
     private fun phi(wavelength: Double): Double = 2 * PI * n(wavelength) * depth() / lambda(wavelength)

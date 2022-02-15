@@ -21,7 +21,7 @@ class Registry<T>(private val default: T, vararg content: T) {
 
     fun add(item: T) {
         if (!added(item)) {
-            val reference = Reference(this, registry.size)
+            val reference = Reference(this, item.hashCode())
             registry[reference] = item
             subscribers.forEach { it.add(reference) }
         }

@@ -1,8 +1,6 @@
 package ru.ioffe.thinfilm.core
 
 import org.apache.commons.math3.complex.Complex
-import org.apache.commons.math3.linear.FieldMatrix
-import org.apache.commons.math3.linear.MatrixUtils
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.core.model.*
 import ru.ioffe.thinfilm.core.util.ExperimentContext
@@ -46,10 +44,10 @@ class Experiment(
         val n0 = inc.properties.n(wavelength)
         val nl = out.properties.n(wavelength)
         val kl = out.properties.k(wavelength)
-        val m11 = m.getEntry(0, 0)
-        val m12 = m.getEntry(0, 1)
-        val m21 = m.getEntry(1, 0)
-        val m22 = m.getEntry(1, 1)
+        val m11 = m[0]
+        val m12 = m[1]
+        val m21 = m[2]
+        val m22 = m[3]
         val v =
             n0 * m11.real + m21.imaginary - nl * (n0 * m12.imaginary + m22.real) + kl * (n0 * m12.real - m22.imaginary)
         val z =
@@ -63,11 +61,33 @@ class Experiment(
         return doubleArrayOf(t, r)
     }
 
-    private fun m(layers: List<Layer>, wavelength: Double): FieldMatrix<Complex> {
+    private fun m(layers: List<Layer>, wavelength: Double): Array<Complex> {
         var m = layers[0].m(wavelength)
-        layers.drop(1).forEach {
-            m = m.multiply(it.m(wavelength))
-        }
+        if (layers.size > 1)
+            for (i in 1 until layers.size) {
+                val mi = layers[i].m(wavelength)
+                val m11 =
+                    Complex(
+                        m[0].real * mi[0].real - m[0].imaginary * mi[0].imaginary - m[1].real * mi[2].real + m[1].imaginary * mi[2].imaginary,
+                        m[0].real * mi[3].imaginary + m[0].imaginary * mi[0].real - m[1].real * mi[2].imaginary - m[1].imaginary * mi[2].real
+                    )
+                val m12 =
+                    Complex(
+                        m[0].real * mi[1].real - m[0].imaginary * mi[1].imaginary + m[1].real * mi[3].real - m[1].imaginary * mi[3].imaginary,
+                        m[0].real * mi[1].imaginary + m[0].imaginary * mi[1].real + m[1].real * mi[3].imaginary + m[1].imaginary * mi[3].real
+                    )
+                val m21 =
+                    Complex(
+                        m[3].real * mi[2].real - m[3].imaginary * mi[2].imaginary + m[2].real * mi[0].real - m[2].imaginary * mi[0].imaginary,
+                        m[3].real * mi[2].imaginary + m[3].imaginary * mi[2].real + m[2].real * mi[0].imaginary + m[2].imaginary * mi[0].real
+                    )
+                val m22 =
+                    Complex(
+                        m[3].real * mi[3].real - m[3].imaginary * mi[3].imaginary - m[2].real * mi[1].real + m[2].imaginary * mi[1].imaginary,
+                        m[3].real * mi[3].imaginary + m[3].imaginary * mi[3].real - m[2].real * mi[1].imaginary - m[2].imaginary * mi[1].real
+                    )
+                m = arrayOf(m11, m12, m21, m22)
+            }
         return m
     }
 

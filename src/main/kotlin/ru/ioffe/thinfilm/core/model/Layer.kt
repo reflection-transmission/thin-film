@@ -13,6 +13,6 @@ class Layer(
     private val fulfill: Double = 1.0
 ) {
 
-    fun m(wavelength: Double): FieldMatrix<Complex> = CharacteristicMatrix(this).calculate(wavelength)
+    fun m(wavelength: Double): Array<Complex> = CharacteristicMatrix(this).calculate(wavelength)
 
 }
