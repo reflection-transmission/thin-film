@@ -28,12 +28,7 @@ sealed class MaterialProperties {
             dispersion.values.map(Complex::getImaginary).toDoubleArray(),
             wavelength
         )
-        println("K IS: $value")
         return value
-    }
-
-    fun complex(wavelength: Double): Complex {
-        return dispersion[wavelength] ?: Complex(n(wavelength), k(wavelength))
     }
 
     fun wavelengths(): List<Double> {

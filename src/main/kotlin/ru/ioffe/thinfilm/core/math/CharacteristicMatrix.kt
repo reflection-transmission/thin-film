@@ -13,14 +13,14 @@ class CharacteristicMatrix(private val layer: Layer) {
             cos(phi(wavelength)) * cosh(phiPrime(wavelength)),
             sin(phi(wavelength)) * sinh(phiPrime(wavelength))
         )
-        val m12 = Complex(
+        val m12 = Complex.I.multiply(Complex(
             (n(wavelength) * paramA(wavelength) + k(wavelength) * paramB(wavelength)) / paramC(wavelength),
             (k(wavelength) * paramA(wavelength) - n(wavelength) * paramB(wavelength)) / paramC(wavelength)
-        )
-        val m21 = Complex(
+        ))
+        val m21 = Complex.I.multiply(Complex(
             n(wavelength) * paramA(wavelength) - k(wavelength) * paramB(wavelength),
             -k(wavelength) * paramA(wavelength) - n(wavelength) * paramB(wavelength)
-        )
+        ))
         val m22 = Complex(
             cos(phi(wavelength)) * cosh(phiPrime(wavelength)),
             sin(phi(wavelength)) * sinh(phiPrime(wavelength))

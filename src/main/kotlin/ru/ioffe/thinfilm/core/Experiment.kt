@@ -21,7 +21,7 @@ class Experiment(
         layers.removeFirst()
         context.spectrums().add(
             ExperimentSeries(
-                Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)),
+                Spectrum(ambient, wavelengths().map(this::film)),
                 name,
                 enabled = true,
                 imported = false,
@@ -64,13 +64,8 @@ class Experiment(
     }
 
     private fun m(layers: List<Layer>, wavelength: Double): FieldMatrix<Complex> {
-        var m = MatrixUtils.createFieldMatrix(
-            arrayOf(
-                arrayOf(Complex(1.0, 0.0), Complex(0.0, 0.0)),
-                arrayOf(Complex(0.0, 0.0), Complex(1.0, 0.0))
-            )
-        )
-        layers.forEach {
+        var m = layers[0].m(wavelength)
+        layers.drop(1).forEach {
             m = m.multiply(it.m(wavelength))
         }
         return m
@@ -82,17 +77,6 @@ class Experiment(
         }
     }
 
-    operator fun Complex.times(value: Double): Complex = this.multiply(value)
-
-    operator fun Complex.times(value: Complex): Complex = this.multiply(value)
-
-    operator fun Complex.plus(value: Complex): Complex = this.add(value)
-
-    operator fun Complex.minus(value: Complex): Complex = this.subtract(value)
-
-    operator fun Complex.div(value: Complex): Complex = this.divide(value)
-
-    operator fun Complex.div(value: Double): Complex = this.divide(value)
 }
 
 
