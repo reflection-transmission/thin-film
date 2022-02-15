@@ -64,32 +64,31 @@ class Experiment(
     private fun m(layers: List<Layer>, wavelength: Double): Array<Complex> {
         val ms = mutableListOf<Array<Complex>>()
         ms.add(layers[0].m(wavelength))
-        if (layers.size > 1)
-            for (i in 1 until layers.size) {
-                val m = ms[i - 1]
-                val mi = layers[i].m(wavelength)
-                val m11 =
-                    Complex(
-                        m[0].real * mi[0].real - m[0].imaginary * mi[0].imaginary - m[1].real * mi[2].real + m[1].imaginary * mi[2].imaginary,
-                        m[0].real * mi[0].imaginary + m[0].imaginary * mi[0].real - m[1].real * mi[2].imaginary - m[1].imaginary * mi[2].real
-                    )
-                val m12 =
-                    Complex(
-                        m[0].real * mi[1].real - m[0].imaginary * mi[1].imaginary + m[1].real * mi[3].real - m[1].imaginary * mi[3].imaginary,
-                        m[0].real * mi[1].imaginary + m[0].imaginary * mi[1].real + m[1].real * mi[3].imaginary + m[1].imaginary * mi[3].real
-                    )
-                val m21 =
-                    Complex(
-                        m[3].real * mi[2].real - m[3].imaginary * mi[2].imaginary + m[2].real * mi[0].real - m[2].imaginary * mi[0].imaginary,
-                        m[3].real * mi[2].imaginary + m[3].imaginary * mi[2].real + m[2].real * mi[0].imaginary + m[2].imaginary * mi[0].real
-                    )
-                val m22 =
-                    Complex(
-                        m[3].real * mi[3].real - m[3].imaginary * mi[3].imaginary - m[2].real * mi[1].real + m[2].imaginary * mi[1].imaginary,
-                        m[3].real * mi[3].imaginary + m[3].imaginary * mi[3].real - m[2].real * mi[1].imaginary - m[2].imaginary * mi[1].real
-                    )
-                ms.add(arrayOf(m11, m12, m21, m22))
-            }
+        layers.drop(1).forEach {
+            val m = ms.last()
+            val mi = it.m(wavelength)
+            val m11 =
+                Complex(
+                    m[0].real * mi[0].real - m[0].imaginary * mi[0].imaginary - m[1].real * mi[2].real + m[1].imaginary * mi[2].imaginary,
+                    m[0].real * mi[0].imaginary + m[0].imaginary * mi[0].real - m[1].real * mi[2].imaginary - m[1].imaginary * mi[2].real
+                )
+            val m12 =
+                Complex(
+                    m[0].real * mi[1].real - m[0].imaginary * mi[1].imaginary + m[1].real * mi[3].real - m[1].imaginary * mi[3].imaginary,
+                    m[0].real * mi[1].imaginary + m[0].imaginary * mi[1].real + m[1].real * mi[3].imaginary + m[1].imaginary * mi[3].real
+                )
+            val m21 =
+                Complex(
+                    m[3].real * mi[2].real - m[3].imaginary * mi[2].imaginary + m[2].real * mi[0].real - m[2].imaginary * mi[0].imaginary,
+                    m[3].real * mi[2].imaginary + m[3].imaginary * mi[2].real + m[2].real * mi[0].imaginary + m[2].imaginary * mi[0].real
+                )
+            val m22 =
+                Complex(
+                    m[3].real * mi[3].real - m[3].imaginary * mi[3].imaginary - m[2].real * mi[1].real + m[2].imaginary * mi[1].imaginary,
+                    m[3].real * mi[3].imaginary + m[3].imaginary * mi[3].real - m[2].real * mi[1].imaginary - m[2].imaginary * mi[1].real
+                )
+            ms.add(arrayOf(m11, m12, m21, m22))
+        }
         return ms.last()
     }
 
