@@ -8,7 +8,7 @@ import kotlin.math.pow
 
 class Layer(
     val properties: MaterialProperties = MaterialProperties.Constant(1.0),
-    val depth: Double = 1.0,
+    val depth: Double,
     val enabled: Boolean = true,
     private val fulfill: Double = 1.0
 ) {

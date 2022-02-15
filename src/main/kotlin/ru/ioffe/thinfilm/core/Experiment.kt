@@ -19,7 +19,7 @@ class Experiment(
         layers.removeFirst()
         context.spectrums().add(
             ExperimentSeries(
-                Spectrum(ambient, wavelengths().map(this::film)),
+                Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)),
                 name,
                 enabled = true,
                 imported = false,
@@ -62,14 +62,16 @@ class Experiment(
     }
 
     private fun m(layers: List<Layer>, wavelength: Double): Array<Complex> {
-        var m = layers[0].m(wavelength)
+        val ms = mutableListOf<Array<Complex>>()
+        ms.add(layers[0].m(wavelength))
         if (layers.size > 1)
             for (i in 1 until layers.size) {
+                val m = ms[i - 1]
                 val mi = layers[i].m(wavelength)
                 val m11 =
                     Complex(
                         m[0].real * mi[0].real - m[0].imaginary * mi[0].imaginary - m[1].real * mi[2].real + m[1].imaginary * mi[2].imaginary,
-                        m[0].real * mi[3].imaginary + m[0].imaginary * mi[0].real - m[1].real * mi[2].imaginary - m[1].imaginary * mi[2].real
+                        m[0].real * mi[0].imaginary + m[0].imaginary * mi[0].real - m[1].real * mi[2].imaginary - m[1].imaginary * mi[2].real
                     )
                 val m12 =
                     Complex(
@@ -86,9 +88,9 @@ class Experiment(
                         m[3].real * mi[3].real - m[3].imaginary * mi[3].imaginary - m[2].real * mi[1].real + m[2].imaginary * mi[1].imaginary,
                         m[3].real * mi[3].imaginary + m[3].imaginary * mi[3].real - m[2].real * mi[1].imaginary - m[2].imaginary * mi[1].real
                     )
-                m = arrayOf(m11, m12, m21, m22)
+                ms.add(arrayOf(m11, m12, m21, m22))
             }
-        return m
+        return ms.last()
     }
 
     private fun wavelengths(): List<Wavelength> = mutableListOf<Wavelength>().apply {

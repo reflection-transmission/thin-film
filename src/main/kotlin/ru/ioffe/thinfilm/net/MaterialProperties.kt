@@ -23,12 +23,11 @@ sealed class MaterialProperties {
     }
 
     fun k(wavelength: Double): Double {
-        val value = Interpolate().value(
+        return Interpolate().value(
             dispersion.keys.toDoubleArray(),
             dispersion.values.map(Complex::getImaginary).toDoubleArray(),
             wavelength
         )
-        return value
     }
 
     fun wavelengths(): List<Double> {

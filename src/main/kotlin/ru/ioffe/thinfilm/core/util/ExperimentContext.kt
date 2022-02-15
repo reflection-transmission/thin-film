@@ -18,7 +18,7 @@ class ExperimentContext {
 
     private val spectrums = Registry(
         default = ExperimentSeries(
-            Spectrum(Layer(), emptyList()), "default",
+            Spectrum(Layer(depth = 100.0), emptyList()), "default",
             enabled = false,
             imported = false,
             transmission = true,
