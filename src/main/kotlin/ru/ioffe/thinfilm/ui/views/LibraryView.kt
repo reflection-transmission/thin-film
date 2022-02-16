@@ -144,8 +144,10 @@ class LibraryView(private val context: ExperimentContext) : View() {
                     parent.removeFromParent()
                     null
                 }
-            } else if (value is Shelf.Book) value.content
-            else null
+            } else if (value is Shelf.Book) {
+                if (search.value != "") parent.isExpanded = true
+                value.content
+            } else null
         }
     }
 

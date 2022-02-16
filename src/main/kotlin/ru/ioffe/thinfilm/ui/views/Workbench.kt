@@ -9,6 +9,7 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
+import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.util.StringConverter
@@ -187,6 +188,16 @@ class Workbench : View() {
                                     context.refresh()
                                 }
                             }
+                            button("❌") {
+                                alignment = Pos.BASELINE_RIGHT
+                                style {
+                                    backgroundColor += Color.TRANSPARENT
+                                }
+                                action {
+                                    context.spectrums().remove(item.value())
+                                    context.refresh()
+                                }
+                            }
                             togglebutton("T", selectFirst = item.value().transmission) {
                                 action {
                                     item.value().transmissionProperty.set(isSelected)
@@ -202,16 +213,6 @@ class Workbench : View() {
                             togglebutton("A", selectFirst = item.value().absorption) {
                                 action {
                                     item.value().absorptionProperty.set(isSelected)
-                                    context.refresh()
-                                }
-                            }
-                            button("❌") {
-                                alignment = Pos.BASELINE_RIGHT
-                                style {
-                                    backgroundColor += Color.TRANSPARENT
-                                }
-                                action {
-                                    context.spectrums().remove(item.value())
                                     context.refresh()
                                 }
                             }
