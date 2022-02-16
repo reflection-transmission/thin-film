@@ -40,13 +40,13 @@ class Experiment(
 
 
     private fun calculate(layers: List<Layer>, inc: Layer, out: Layer, wavelength: Double): DoubleArray {
-        val m = m(layers, wavelength)
+        val m = matrixM(layers, wavelength)
         val n0 = inc.properties.n(wavelength)
         val nl = out.properties.n(wavelength)
         val kl = out.properties.k(wavelength)
         val m11 = m[0]
-        val m12 = m[1]
-        val m21 = m[2]
+        val m12 = m[1].divide(Complex.I)
+        val m21 = m[2].divide(Complex.I)
         val m22 = m[3]
         val v =
             n0 * m11.real + m21.imaginary - nl * (n0 * m12.imaginary + m22.real) + kl * (n0 * m12.real - m22.imaginary)
@@ -92,11 +92,35 @@ class Experiment(
         return ms.last()
     }
 
+    fun matrixM(layers: List<Layer>, wavelength: Double): Array<Complex> {
+        var m = layers.get(0).m(wavelength)
+        m[1] = Complex.I * m[1]
+        m[2] = Complex.I * m[2]
+        layers.drop(1).forEach {
+            val mi = it.m(wavelength)
+            mi[1] = Complex.I * mi[1]
+            mi[2] = Complex.I * mi[2]
+            m = arrayOf(
+                (m[0] * mi[0]) + (m[1] * mi[2]),
+                (m[0] * mi[1]) + (m[1] * mi[3]),
+                (m[2] * mi[0]) + (m[3] * mi[2]),
+                (m[2] * mi[1]) + (m[3] * mi[3])
+            ) // Just a multiplication
+        }
+        return m
+    }
+
     private fun wavelengths(): List<Wavelength> = mutableListOf<Wavelength>().apply {
         for (i in wavelengths.min..wavelengths.max step 1) {
             add(Wavelength(i.toDouble() / 1000, 0.0, 1.0, 0.0))
         }
     }
+
+    operator fun Complex.times(value: Complex): Complex = this.multiply(value)
+
+    operator fun Complex.plus(value: Complex): Complex = this.add(value)
+
+    operator fun Complex.minus(value: Complex): Complex = this.minus(value)
 
 }
 
