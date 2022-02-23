@@ -1,18 +1,17 @@
 package ru.ioffe.thinfilm.core.model
 
-import org.apache.commons.math3.complex.Complex
-import org.apache.commons.math3.linear.FieldMatrix
-import ru.ioffe.thinfilm.core.math.CharacteristicMatrix
-import ru.ioffe.thinfilm.net.MaterialProperties
-import kotlin.math.pow
+import org.jetbrains.kotlinx.multik.ndarray.complex.ComplexDouble
+import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
+import ru.ioffe.thinfilm.core.math.TransferMatrix
+import ru.ioffe.thinfilm.net.RefractiveIndex
 
 class Layer(
-    val properties: MaterialProperties = MaterialProperties.Constant(1.0),
     val depth: Double,
-    val enabled: Boolean = true,
-    private val fulfill: Double = 1.0
+    val index: RefractiveIndex = RefractiveIndex.Constant(1.0)
 ) {
 
-    fun m(wavelength: Double): Array<Complex> = CharacteristicMatrix(this).calculate(wavelength)
+    fun matrix(wavelength: Double): D2Array<ComplexDouble> {
+        return TransferMatrix().propagation(ComplexDouble(index.n(wavelength), index.k(wavelength)), depth, wavelength.times(1000))
+    }
 
 }

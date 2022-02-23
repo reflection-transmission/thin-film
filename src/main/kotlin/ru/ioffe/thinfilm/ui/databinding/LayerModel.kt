@@ -10,9 +10,7 @@ import tornadofx.*
 class LayerModel(
     type: Int,
     depth: Double,
-    fulfill: Double,
     material: Reference<Material>,
-    enabled: Boolean = true
 ) {
 
     companion object {
@@ -27,16 +25,10 @@ class LayerModel(
     val depthProperty = SimpleDoubleProperty(depth)
     var depth by depthProperty
 
-    val fulfillProperty = SimpleDoubleProperty(fulfill)
-    var fulfill by fulfillProperty
-
     val materialProperty = SimpleObjectProperty(material)
     var material by materialProperty
 
-    val enabledProperty = SimpleBooleanProperty(enabled)
-    var enabled by enabledProperty
-
     fun layer(registry: Registry<Material>): Layer =
-        Layer(registry.get(material).properties(), depth, enabled, fulfill)
+        Layer(depth, registry.get(material).properties())
 
 }

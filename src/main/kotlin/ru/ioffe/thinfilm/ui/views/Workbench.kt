@@ -40,9 +40,9 @@ class Workbench : View() {
         title = "Thin Film Calculator"
         context.materials().subscribe(indexes)
         context.spectrums().subscribe(spectrums)
-        layers.add(LayerModel(LayerModel.Ambient, 1.0, 1.0, indexes[0]))
-        layers.add(LayerModel(LayerModel.Film, 200.0, 1.0, indexes[1]))
-        layers.add(LayerModel(LayerModel.Substrate, 1.0, 1.0, indexes[2]))
+        layers.add(LayerModel(LayerModel.Ambient, 1.0, indexes[0]))
+        layers.add(LayerModel(LayerModel.Film, 200.0, indexes[1]))
+        layers.add(LayerModel(LayerModel.Substrate, 1.0, indexes[2]))
     }
 
     override fun onUndock() {
@@ -70,7 +70,7 @@ class Workbench : View() {
                     action {
                         layers.add(
                             layers.size - 1,
-                            LayerModel(LayerModel.Film, 1.0, 1.0, Reference(context.materials(), 0))
+                            LayerModel(LayerModel.Film, 1.0, Reference(context.materials(), 0))
                         )
                     }
                     tooltip = tooltip("Add Layer")
@@ -88,8 +88,6 @@ class Workbench : View() {
                             Experiment(
                                 context,
                                 layers.map { it.layer(context.materials()) }.toMutableList(),
-                                layers.first().layer(context.materials()),
-                                layers.last().layer(context.materials()),
                                 WavelengthDomain(from.get(), to.get())
                             ).start("custom series")
                         } else {
@@ -136,18 +134,11 @@ class Workbench : View() {
                         makeEditable()
                         useTextField(NumberStringConverter())
                     }
-                    column("Fulfill", LayerModel::fulfillProperty) {
-                        makeEditable()
-                        useTextField(object : StringConverter<Number>() {
-                            override fun fromString(string: String?): Double = (string ?: "0").toDouble()
-                            override fun toString(double: Number?): String = double.toString()
-                        })
-                    }
                     column("Material", LayerModel::materialProperty) {
                         useComboBox(indexes)
                         remainingWidth()
                     }
-                    column(" ", LayerModel::fulfillProperty).cellFormat {
+                    column(" ", LayerModel::typeProperty).cellFormat {
                         val element: LayerModel = this@cellFormat.rowItem
                         if (element.type == 0) {
                             graphic = hbox {

@@ -13,7 +13,7 @@ import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.core.util.Reference
 import ru.ioffe.thinfilm.core.util.ExperimentContext
 import ru.ioffe.thinfilm.net.Library
-import ru.ioffe.thinfilm.net.MaterialProperties
+import ru.ioffe.thinfilm.net.RefractiveIndex
 import ru.ioffe.thinfilm.net.Shelf
 import tornadofx.*
 
@@ -27,7 +27,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
     init {
         title = "RefractiveIndex.info Library"
         context.materials().subscribe(selected)
-        selected.removeIf { context.materials().get(it).properties() is MaterialProperties.Constant }
+        selected.removeIf { context.materials().get(it).properties() is RefractiveIndex.Constant }
     }
 
     override fun onUndock() {
@@ -89,7 +89,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
 
     private fun draw(chart: LineChart<Number, Number>, value: Any?, add: Button) {
         chart.data.clear()
-        lateinit var material: MaterialProperties
+        lateinit var material: RefractiveIndex
         if (value is Shelf.Book.Page) {
             material = material(value)
             val entry = Material.Defined(value.toString(), material)
@@ -151,7 +151,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
         }
     }
 
-    private fun material(page: Shelf.Book.Page): MaterialProperties {
+    private fun material(page: Shelf.Book.Page): RefractiveIndex {
         return library.entry(page).data[0]
     }
 

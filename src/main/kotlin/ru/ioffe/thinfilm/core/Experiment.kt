@@ -1,25 +1,32 @@
 package ru.ioffe.thinfilm.core
 
 import org.apache.commons.math3.complex.Complex
+import org.jetbrains.kotlinx.multik.api.linalg.dot
+import org.jetbrains.kotlinx.multik.ndarray.complex.ComplexDouble
+import org.jetbrains.kotlinx.multik.ndarray.complex.div
+import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
+import org.jetbrains.kotlinx.multik.ndarray.data.get
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
-import ru.ioffe.thinfilm.core.model.*
+import ru.ioffe.thinfilm.core.model.ExperimentSeries
+import ru.ioffe.thinfilm.core.model.Layer
+import ru.ioffe.thinfilm.core.model.Spectrum
+import ru.ioffe.thinfilm.core.model.Wavelength
+import ru.ioffe.thinfilm.core.math.TransferMatrix
 import ru.ioffe.thinfilm.core.util.ExperimentContext
 import kotlin.math.pow
 
 class Experiment(
     private val context: ExperimentContext,
     private val layers: MutableList<Layer>,
-    private val ambient: Layer,
-    private val substrate: Layer,
     private val wavelengths: WavelengthDomain = WavelengthDomain.default()
 ) {
 
+    private val tm = TransferMatrix()
+
     fun start(name: String) {
-        layers.removeLast()
-        layers.removeFirst()
         context.spectrums().add(
             ExperimentSeries(
-                Spectrum(ambient, wavelengths().map(this::film).map(this::substrate)),
+                Spectrum(layers[0], wavelengths().map(this::film)),
                 name,
                 enabled = true,
                 imported = false,
@@ -31,83 +38,34 @@ class Experiment(
         context.refresh()
     }
 
-    private fun substrate(it: Wavelength) = Substrate(layers.last().properties, substrate, ambient.properties).apply(it)
-
     private fun film(it: Wavelength): Wavelength {
-        val trRf = calculate(layers.filter(Layer::enabled), ambient, substrate, it.length)
+        val trRf = calculate(layers, it.length)
         return Wavelength(it.length, it.angle, trRf[0], trRf[1])
     }
 
 
-    private fun calculate(layers: List<Layer>, inc: Layer, out: Layer, wavelength: Double): DoubleArray {
-        val m = matrixM(layers, wavelength)
-        val n0 = inc.properties.n(wavelength)
-        val nl = out.properties.n(wavelength)
-        val kl = out.properties.k(wavelength)
-        val m11 = m[0]
-        val m12 = m[1].divide(Complex.I)
-        val m21 = m[2].divide(Complex.I)
-        val m22 = m[3]
-        val v =
-            n0 * m11.real + m21.imaginary - nl * (n0 * m12.imaginary + m22.real) + kl * (n0 * m12.real - m22.imaginary)
-        val z =
-            n0 * m11.imaginary - m21.real + nl * (n0 * m12.real - m22.imaginary) + kl * (n0 * m12.imaginary + m22.real)
-        val x =
-            n0 * m11.real - m21.imaginary - nl * (n0 * m12.imaginary - m22.real) + kl * (n0 * m12.real + m22.imaginary)
-        val y =
-            n0 * m11.imaginary + m21.real + nl * (n0 * m12.real + m22.imaginary) + kl * (n0 * m12.imaginary - m22.real)
-        val t = 4 * n0 * nl / (x.pow(2) + y.pow(2))
-        val r = (v.pow(2) + z.pow(2)) / (x.pow(2) + y.pow(2))
-        return doubleArrayOf(t, r)
+    private fun calculate(layers: List<Layer>, wavelength: Double): DoubleArray {
+        val matrix = m(layers, wavelength)
+        return doubleArrayOf(
+            (1 / matrix[0, 0]).abs().pow(2) * layers.last().index.n(wavelength) / layers.first().index.n(wavelength),
+            (matrix[1, 0] / matrix[0, 0]).abs().pow(2)
+        )
     }
 
-    private fun m(layers: List<Layer>, wavelength: Double): Array<Complex> {
-        val ms = mutableListOf<Array<Complex>>()
-        ms.add(layers[0].m(wavelength))
-        layers.drop(1).forEach {
-            val m = ms.last()
-            val mi = it.m(wavelength)
-            val m11 =
-                Complex(
-                    m[0].real * mi[0].real - m[0].imaginary * mi[0].imaginary - m[1].real * mi[2].real + m[1].imaginary * mi[2].imaginary,
-                    m[0].real * mi[0].imaginary + m[0].imaginary * mi[0].real - m[1].real * mi[2].imaginary - m[1].imaginary * mi[2].real
-                )
-            val m12 =
-                Complex(
-                    m[0].real * mi[1].real - m[0].imaginary * mi[1].imaginary + m[1].real * mi[3].real - m[1].imaginary * mi[3].imaginary,
-                    m[0].real * mi[1].imaginary + m[0].imaginary * mi[1].real + m[1].real * mi[3].imaginary + m[1].imaginary * mi[3].real
-                )
-            val m21 =
-                Complex(
-                    m[3].real * mi[2].real - m[3].imaginary * mi[2].imaginary + m[2].real * mi[0].real - m[2].imaginary * mi[0].imaginary,
-                    m[3].real * mi[2].imaginary + m[3].imaginary * mi[2].real + m[2].real * mi[0].imaginary + m[2].imaginary * mi[0].real
-                )
-            val m22 =
-                Complex(
-                    m[3].real * mi[3].real - m[3].imaginary * mi[3].imaginary - m[2].real * mi[1].real + m[2].imaginary * mi[1].imaginary,
-                    m[3].real * mi[3].imaginary + m[3].imaginary * mi[3].real - m[2].real * mi[1].imaginary - m[2].imaginary * mi[1].real
-                )
-            ms.add(arrayOf(m11, m12, m21, m22))
-        }
-        return ms.last()
+    private fun m(layers: List<Layer>, wavelength: Double): D2Array<ComplexDouble> {
+        val n = layers.map { it.index.value(wavelength) }
+        val incidenceAngle = ComplexDouble(0.0)
+        return tm.refraction(n[0], n[1], incidenceAngle)
+            .dot(tm.propagation(n[1], layers[1].depth, wavelength * 1000))
+            .dot(tm.refraction(n[1], n[2], tm.snell(incidenceAngle, n[1], n[2])))
+            .dot(tm.propagation(n[2], layers[2].depth, wavelength * 1000))
+            .dot(tm.refraction(n[2], n[3], tm.snell(tm.snell(incidenceAngle, n[1], n[2]), n[2], n[3])))
     }
 
-    fun matrixM(layers: List<Layer>, wavelength: Double): Array<Complex> {
-        var m = layers.get(0).m(wavelength)
-        m[1] = Complex.I * m[1]
-        m[2] = Complex.I * m[2]
-        layers.drop(1).forEach {
-            val mi = it.m(wavelength)
-            mi[1] = Complex.I * mi[1]
-            mi[2] = Complex.I * mi[2]
-            m = arrayOf(
-                (m[0] * mi[0]) + (m[1] * mi[2]),
-                (m[0] * mi[1]) + (m[1] * mi[3]),
-                (m[2] * mi[0]) + (m[3] * mi[2]),
-                (m[2] * mi[1]) + (m[3] * mi[3])
-            ) // Just a multiplication
-        }
-        return m
+    private fun transfer(first: Layer, second: Layer, wavelength: Double): D2Array<ComplexDouble> {
+        val n1 = ComplexDouble(first.index.n(wavelength), first.index.k(wavelength))
+        val n2 = ComplexDouble(second.index.n(wavelength), second.index.k(wavelength))
+        return TransferMatrix().refraction(n1, n2, ComplexDouble(0.0))
     }
 
     private fun wavelengths(): List<Wavelength> = mutableListOf<Wavelength>().apply {

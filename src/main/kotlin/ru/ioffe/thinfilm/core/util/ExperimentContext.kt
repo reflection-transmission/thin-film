@@ -4,16 +4,16 @@ import ru.ioffe.thinfilm.core.model.Layer
 import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.core.model.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.Spectrum
-import ru.ioffe.thinfilm.net.MaterialProperties
+import ru.ioffe.thinfilm.net.RefractiveIndex
 import java.util.function.Consumer
 
 class ExperimentContext {
 
     private val materials = Registry<Material>(
-        default = Material.Defined("Air", MaterialProperties.Constant(1.0)),
-        Material.Defined("Air", MaterialProperties.Constant(1.0)),
-        Material.Defined("Constant 2.3", MaterialProperties.Constant(2.3)),
-        Material.Defined("Constant 1.5", MaterialProperties.Constant(1.5))
+        default = Material.Defined("Air", RefractiveIndex.Constant(1.0)),
+        Material.Defined("Air", RefractiveIndex.Constant(1.0)),
+        Material.Defined("Constant 2.3", RefractiveIndex.Constant(2.3)),
+        Material.Defined("Constant 1.5", RefractiveIndex.Constant(1.5))
     )
 
     private val spectrums = Registry(

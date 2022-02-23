@@ -3,13 +3,14 @@ package ru.ioffe.thinfilm.net
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.apache.commons.math3.complex.Complex
+import org.jetbrains.kotlinx.multik.ndarray.complex.ComplexDouble
 import ru.ioffe.thinfilm.core.math.Interpolate
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
 @Serializable
-sealed class MaterialProperties {
+sealed class RefractiveIndex {
 
     @kotlinx.serialization.Transient
     protected val dispersion = mutableMapOf<Double, Complex>()
@@ -30,13 +31,15 @@ sealed class MaterialProperties {
         )
     }
 
+    fun value(wavelength: Double): ComplexDouble = ComplexDouble(n(wavelength), k(wavelength))
+
     fun wavelengths(): List<Double> {
         return dispersion.keys.toList()
     }
 
     @Serializable
     @SerialName("tabulated n")
-    data class TabulatedN(val data: String) : MaterialProperties() {
+    data class TabulatedN(val data: String) : RefractiveIndex() {
 
         init {
             val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
@@ -49,7 +52,7 @@ sealed class MaterialProperties {
 
     @Serializable
     @SerialName("tabulated nk")
-    data class TabulatedNK(val data: String) : MaterialProperties() {
+    data class TabulatedNK(val data: String) : RefractiveIndex() {
 
         init {
             val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
@@ -65,7 +68,7 @@ sealed class MaterialProperties {
 
     @Serializable
     @SerialName("formula 1")
-    data class FormulaOne(val wavelength_range: String, val coefficients: String) : MaterialProperties() {
+    data class FormulaOne(val wavelength_range: String, val coefficients: String) : RefractiveIndex() {
 
         init {
             val range = wavelength_range.split(" ").map(String::toDouble).map { (it * 1000).roundToInt() }
@@ -83,7 +86,7 @@ sealed class MaterialProperties {
 
     @Serializable
     @SerialName("formula 2")
-    data class FormulaTwo(val wavelength_range: String, val coefficients: String) : MaterialProperties() {
+    data class FormulaTwo(val wavelength_range: String, val coefficients: String) : RefractiveIndex() {
 
         init {
             val range = wavelength_range.split(" ").map(String::toDouble).map { (it * 1000).roundToInt() }
@@ -103,7 +106,7 @@ sealed class MaterialProperties {
 
     @Serializable
     @SerialName("tabulated k")
-    data class TabulatedK(val data: String) : MaterialProperties() {
+    data class TabulatedK(val data: String) : RefractiveIndex() {
 
         init {
             val split = data.replace("\n", " ").split(" ").filterNot { it.isEmpty() }
@@ -114,7 +117,7 @@ sealed class MaterialProperties {
 
     }
 
-    data class Constant(val value: Double) : MaterialProperties() {
+    data class Constant(val value: Double) : RefractiveIndex() {
         init {
             for (i in 200..2000) {
                 dispersion[i.toDouble() / 1000] = Complex(value, 0.0)

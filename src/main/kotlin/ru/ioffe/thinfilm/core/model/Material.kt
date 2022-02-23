@@ -1,10 +1,10 @@
 package ru.ioffe.thinfilm.core.model
 
-import ru.ioffe.thinfilm.net.MaterialProperties
+import ru.ioffe.thinfilm.net.RefractiveIndex
 
 sealed class Material(val name: String) {
 
-    abstract fun properties(): MaterialProperties
+    abstract fun properties(): RefractiveIndex
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -23,9 +23,9 @@ sealed class Material(val name: String) {
         return name.hashCode()
     }
 
-    class Defined(name: String, private val properties: MaterialProperties) : Material(name) {
+    class Defined(name: String, private val properties: RefractiveIndex) : Material(name) {
 
-        override fun properties(): MaterialProperties = properties
+        override fun properties(): RefractiveIndex = properties
 
     }
 
