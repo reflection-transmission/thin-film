@@ -1,7 +1,9 @@
 package ru.ioffe.thinfilm.core
 
 import org.apache.commons.math3.complex.Complex
+import org.jetbrains.kotlinx.multik.api.identity
 import org.jetbrains.kotlinx.multik.api.linalg.dot
+import org.jetbrains.kotlinx.multik.api.mk
 import org.jetbrains.kotlinx.multik.ndarray.complex.ComplexDouble
 import org.jetbrains.kotlinx.multik.ndarray.complex.div
 import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
@@ -55,17 +57,22 @@ class Experiment(
     private fun m(layers: List<Layer>, wavelength: Double): D2Array<ComplexDouble> {
         val n = layers.map { it.index.value(wavelength) }
         val incidenceAngle = ComplexDouble(0.0)
-        return tm.refraction(n[0], n[1], incidenceAngle)
-            .dot(tm.propagation(n[1], layers[1].depth, wavelength * 1000))
-            .dot(tm.refraction(n[1], n[2], tm.snell(incidenceAngle, n[1], n[2])))
-            .dot(tm.propagation(n[2], layers[2].depth, wavelength * 1000))
-            .dot(tm.refraction(n[2], n[3], tm.snell(tm.snell(incidenceAngle, n[1], n[2]), n[2], n[3])))
+        val theta = angles(incidenceAngle, n)
+        var m = mk.identity<ComplexDouble>(2)
+        for (i in 1 until layers.size - 1) {
+            m = m.dot(tm.propagation(n[i], layers[i].depth, wavelength * 1000))
+                .dot(tm.refraction(n[1], n[2], theta[i]))
+        }
+        return tm.refraction(n[0], n[1], theta[0]).dot(m)
     }
 
-    private fun transfer(first: Layer, second: Layer, wavelength: Double): D2Array<ComplexDouble> {
-        val n1 = ComplexDouble(first.index.n(wavelength), first.index.k(wavelength))
-        val n2 = ComplexDouble(second.index.n(wavelength), second.index.k(wavelength))
-        return TransferMatrix().refraction(n1, n2, ComplexDouble(0.0))
+    private fun angles(incidence: ComplexDouble, ns: List<ComplexDouble>): Array<ComplexDouble> {
+        val thetas = Array(ns.size) { ComplexDouble(0.0) }
+        thetas[0] = incidence
+        for (i in 1 until thetas.size) {
+            thetas[i] = tm.snell(thetas[i - 1], ns[i - 1], ns[i])
+        }
+        return thetas
     }
 
     private fun wavelengths(): List<Wavelength> = mutableListOf<Wavelength>().apply {
