@@ -6,7 +6,7 @@ class WavelengthDomain(val min: Int, val max: Int) {
 
     companion object {
         fun default(): WavelengthDomain {
-            return WavelengthDomain(400, 1800)
+            return WavelengthDomain(200, 2000)
         }
 
         fun visible(): WavelengthDomain {

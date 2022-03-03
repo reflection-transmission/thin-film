@@ -8,26 +8,21 @@ import org.jetbrains.kotlinx.multik.ndarray.complex.ComplexDouble
 import org.jetbrains.kotlinx.multik.ndarray.complex.div
 import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
 import org.jetbrains.kotlinx.multik.ndarray.data.get
-import ru.ioffe.thinfilm.core.math.Color
-import ru.ioffe.thinfilm.core.math.WavelengthDomain
-import ru.ioffe.thinfilm.core.model.ExperimentSeries
-import ru.ioffe.thinfilm.core.model.Layer
-import ru.ioffe.thinfilm.core.model.Spectrum
-import ru.ioffe.thinfilm.core.model.Wavelength
 import ru.ioffe.thinfilm.core.math.TransferMatrix
+import ru.ioffe.thinfilm.core.model.*
 import ru.ioffe.thinfilm.core.util.ExperimentContext
 import kotlin.math.pow
 
 class Experiment(
     private val context: ExperimentContext,
-    private val layers: MutableList<Layer>,
-    private val wavelengths: WavelengthDomain = WavelengthDomain.default()
+    private val source: LightSource,
+    private val layers: MutableList<Layer>
 ) {
 
     private val tm = TransferMatrix()
 
     fun start(name: String) : Spectrum {
-        val spectrum = Spectrum(layers[0], wavelengths().map(this::film))
+        val spectrum = Spectrum(layers[0], source.profile.map(this::film))
         context.spectrums().add(
             ExperimentSeries(
                 spectrum,
@@ -76,12 +71,6 @@ class Experiment(
             thetas[i] = tm.snell(thetas[i - 1], ns[i - 1], ns[i])
         }
         return thetas
-    }
-
-    private fun wavelengths(): List<Wavelength> = mutableListOf<Wavelength>().apply {
-        for (i in wavelengths.min..wavelengths.max step 1) {
-            add(Wavelength(i.toDouble() / 1000, 0.0, 1.0, 0.0))
-        }
     }
 
     operator fun Complex.times(value: Complex): Complex = this.multiply(value)

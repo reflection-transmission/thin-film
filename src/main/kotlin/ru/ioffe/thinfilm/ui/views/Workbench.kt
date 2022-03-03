@@ -46,6 +46,7 @@ class Workbench : View() {
         context.materials().subscribe(indexes)
         context.spectrums().subscribe(spectrums)
         context.sources().subscribe(sources)
+        source.value = sources[0]
         layers.add(LayerModel(LayerModel.Ambient, 1.0, indexes[0]))
         layers.add(LayerModel(LayerModel.Film, 200.0, indexes[1]))
         layers.add(LayerModel(LayerModel.Substrate, 1.0, indexes[2]))
@@ -93,8 +94,8 @@ class Workbench : View() {
                         if (layers.size > 2) {
                             val spectrum = Experiment(
                                 context,
-                                layers.map { it.layer(context.materials()) }.toMutableList(),
-                                WavelengthDomain(from.get(), to.get())
+                                context.sources().get(source.value).applyDomain(WavelengthDomain(from.get(), to.get())),
+                                layers.map { it.layer(context.materials()) }.toMutableList()
                             ).start("custom series")
                             color.set(Color.valueOf(ru.ioffe.thinfilm.core.math.Color(spectrum).toRGB()))
                         } else {
@@ -121,10 +122,20 @@ class Workbench : View() {
 
                     }
                 }
-                combobox(property = source, values = sources) { value = sources[0] }
+                combobox(property = source, values = sources) {
+                    value = sources[0]
+                }
                 colorpicker(color) {
                     isMouseTransparent = true
                     opacity = 1.0
+                    stylesheet {
+                        Stylesheet.arrow {
+                            backgroundColor += Color.TRANSPARENT
+                        }
+                        Stylesheet.arrowButton {
+                            backgroundColor += Color.TRANSPARENT
+                        }
+                    }
                 }
             }
 
