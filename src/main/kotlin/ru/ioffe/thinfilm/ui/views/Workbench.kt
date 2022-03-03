@@ -1,6 +1,7 @@
 package ru.ioffe.thinfilm.ui.views
 
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.collections.FXCollections
 import javafx.geometry.HPos
@@ -9,18 +10,17 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
-import javafx.scene.layout.Priority
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser.ExtensionFilter
-import javafx.util.StringConverter
 import javafx.util.converter.NumberStringConverter
+import ru.ioffe.thinfilm.core.Experiment
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.core.model.ExperimentSeries
+import ru.ioffe.thinfilm.core.model.LightSource
 import ru.ioffe.thinfilm.core.model.Material
-import ru.ioffe.thinfilm.core.util.Reference
 import ru.ioffe.thinfilm.core.util.ExperimentContext
 import ru.ioffe.thinfilm.core.util.Import
-import ru.ioffe.thinfilm.core.Experiment
+import ru.ioffe.thinfilm.core.util.Reference
 import ru.ioffe.thinfilm.ui.databinding.LayerModel
 import ru.ioffe.thinfilm.ui.views.hooks.ChartHook
 import ru.ioffe.thinfilm.ui.views.hooks.TextHook
@@ -29,17 +29,23 @@ import tornadofx.*
 class Workbench : View() {
 
     private val layers = mutableListOf<LayerModel>().asObservable()
+
     private val from = SimpleIntegerProperty(400)
     private val to = SimpleIntegerProperty(1600)
     private val output = SimpleStringProperty()
+    private val source = SimpleObjectProperty<Reference<LightSource>>()
+    private val color = SimpleObjectProperty(Color.valueOf("#ffffff"))
+
     private val context = ExperimentContext()
     private val indexes = FXCollections.observableArrayList<Reference<Material>>()
     private val spectrums = FXCollections.observableArrayList<Reference<ExperimentSeries>>()
+    private val sources = FXCollections.observableArrayList<Reference<LightSource>>()
 
     init {
         title = "Thin Film Calculator"
         context.materials().subscribe(indexes)
         context.spectrums().subscribe(spectrums)
+        context.sources().subscribe(sources)
         layers.add(LayerModel(LayerModel.Ambient, 1.0, indexes[0]))
         layers.add(LayerModel(LayerModel.Film, 200.0, indexes[1]))
         layers.add(LayerModel(LayerModel.Substrate, 1.0, indexes[2]))
@@ -85,11 +91,12 @@ class Workbench : View() {
                     useMaxWidth = true
                     action {
                         if (layers.size > 2) {
-                            Experiment(
+                            val spectrum = Experiment(
                                 context,
                                 layers.map { it.layer(context.materials()) }.toMutableList(),
                                 WavelengthDomain(from.get(), to.get())
                             ).start("custom series")
+                            color.set(Color.valueOf(ru.ioffe.thinfilm.core.math.Color(spectrum).toRGB()))
                         } else {
                             println("You have to define at least three layers")
                         }
@@ -113,6 +120,11 @@ class Workbench : View() {
                         }
 
                     }
+                }
+                combobox(property = source, values = sources) { value = sources[0] }
+                colorpicker(color) {
+                    isMouseTransparent = true
+                    opacity = 1.0
                 }
             }
 

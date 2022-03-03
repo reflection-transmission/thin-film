@@ -24,6 +24,7 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.36.0")
     implementation("no.tornado:tornadofx:1.7.20")
     implementation("org.apache.commons:commons-math3:3.6.1")
+    implementation("com.github.ajalt.colormath:colormath:3.2.0")
     implementation("org.jetbrains.kotlinx:multik-api:0.1.1")
     implementation("org.jetbrains.kotlinx:multik-default:0.1.1")
     implementation("org.snakeyaml:snakeyaml-engine:2.3")

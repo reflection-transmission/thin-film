@@ -1,9 +1,6 @@
 package ru.ioffe.thinfilm.core.util
 
-import ru.ioffe.thinfilm.core.model.Layer
-import ru.ioffe.thinfilm.core.model.Material
-import ru.ioffe.thinfilm.core.model.ExperimentSeries
-import ru.ioffe.thinfilm.core.model.Spectrum
+import ru.ioffe.thinfilm.core.model.*
 import ru.ioffe.thinfilm.net.RefractiveIndex
 import java.util.function.Consumer
 
@@ -27,11 +24,15 @@ class ExperimentContext {
         )
     )
 
+    private val sources = Registry(default = LightSource.flat("default"), LightSource.flat("Flat Spectrum"))
+
     private val hooks = mutableListOf<Consumer<List<ExperimentSeries>>>()
 
     fun materials() = materials
 
     fun spectrums() = spectrums
+
+    fun sources() = sources
 
     fun hooks() = hooks
 

@@ -8,6 +8,7 @@ import org.jetbrains.kotlinx.multik.ndarray.complex.ComplexDouble
 import org.jetbrains.kotlinx.multik.ndarray.complex.div
 import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
 import org.jetbrains.kotlinx.multik.ndarray.data.get
+import ru.ioffe.thinfilm.core.math.Color
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.core.model.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.Layer
@@ -25,10 +26,11 @@ class Experiment(
 
     private val tm = TransferMatrix()
 
-    fun start(name: String) {
+    fun start(name: String) : Spectrum {
+        val spectrum = Spectrum(layers[0], wavelengths().map(this::film))
         context.spectrums().add(
             ExperimentSeries(
-                Spectrum(layers[0], wavelengths().map(this::film)),
+                spectrum,
                 name,
                 enabled = true,
                 imported = false,
@@ -38,6 +40,7 @@ class Experiment(
             )
         )
         context.refresh()
+        return spectrum
     }
 
     private fun film(it: Wavelength): Wavelength {
