@@ -29,6 +29,6 @@ class LayerModel(
     var material by materialProperty
 
     fun layer(registry: Registry<Material>): Layer =
-        Layer(depth, registry.get(material).properties())
+        Layer(depth, registry.get(material).index())
 
 }

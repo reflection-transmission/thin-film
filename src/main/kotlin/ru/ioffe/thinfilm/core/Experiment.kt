@@ -28,7 +28,6 @@ class Experiment(
                 spectrum,
                 name,
                 enabled = true,
-                imported = false,
                 transmission = true,
                 reflection = true,
                 absorption = false

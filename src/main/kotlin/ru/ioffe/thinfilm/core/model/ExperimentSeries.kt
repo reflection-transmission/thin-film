@@ -6,7 +6,6 @@ import tornadofx.*
 class ExperimentSeries(
     val spectrum: Spectrum,
     private val name: String,
-    val imported: Boolean,
     enabled: Boolean,
     transmission: Boolean,
     reflection: Boolean,

@@ -27,7 +27,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
     init {
         title = "RefractiveIndex.info Library"
         context.materials().subscribe(selected)
-        selected.removeIf { context.materials().get(it).properties() is RefractiveIndex.Constant }
+        selected.removeIf { context.materials().get(it).index() is RefractiveIndex.Constant }
     }
 
     override fun onUndock() {
@@ -97,7 +97,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
                 context.materials().add(entry)
             }
         } else if (value is Reference<*>) {
-            material = context.materials().get(value as Reference<Material>).properties()
+            material = context.materials().get(value as Reference<Material>).index()
         } else {
             return
         }

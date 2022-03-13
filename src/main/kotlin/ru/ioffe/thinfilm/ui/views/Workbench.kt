@@ -181,6 +181,7 @@ class Workbench : View() {
                         }
                     }
                     smartResize()
+                    maxWidth = Double.MAX_VALUE
                 }
                 chart = linechart("System Transmission/Reflection/Absorption", NumberAxis(), NumberAxis()) {
                     createSymbols = false

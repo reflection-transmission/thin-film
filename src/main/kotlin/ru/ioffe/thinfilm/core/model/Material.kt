@@ -4,7 +4,7 @@ import ru.ioffe.thinfilm.net.RefractiveIndex
 
 sealed class Material(val name: String) {
 
-    abstract fun properties(): RefractiveIndex
+    abstract fun index(): RefractiveIndex
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -25,7 +25,7 @@ sealed class Material(val name: String) {
 
     class Defined(name: String, private val properties: RefractiveIndex) : Material(name) {
 
-        override fun properties(): RefractiveIndex = properties
+        override fun index(): RefractiveIndex = properties
 
     }
 

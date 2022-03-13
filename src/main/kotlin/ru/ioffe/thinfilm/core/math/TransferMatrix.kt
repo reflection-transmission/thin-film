@@ -11,8 +11,18 @@ import kotlin.math.*
 
 class TransferMatrix {
 
+    /**
+     * Imaginary unit
+     */
     private val i = ComplexDouble(0, 1)
 
+    /**
+     * Creates propagation matrix P for layer with the given params.
+     * Note that depth and wavelength must have the same dimensions.
+     * @param n complex refractive index (n + ik)
+     * @param d layer's depth
+     * @param wavelength light's wavelength
+     */
     fun propagation(n: ComplexDouble, d: Double, wavelength: Double): D2Array<ComplexDouble> {
         val delta = d * 2 * PI * n / wavelength
         return mk.ndarray(
@@ -22,6 +32,11 @@ class TransferMatrix {
         )
     }
 
+    /**
+     * Creates a refraction matrix D for an interface between two given layers.
+     * @param n1 complex refractive index (n + ik) for the first layer (incident layer)
+     * @param n2 complex refractive index (n + ik) for the second layer
+     */
     fun refraction(n1: ComplexDouble, n2: ComplexDouble, angle: ComplexDouble): D2Array<ComplexDouble> {
         val tr = transmission(angle, n1, n2, Polarization.Normal)
         val re = reflection(angle, n1, n2, Polarization.Normal)
@@ -34,8 +49,14 @@ class TransferMatrix {
 
     // Optics
 
+    /**
+     * Snell's law
+     */
     fun snell(theta1: ComplexDouble, n1: ComplexDouble, n2: ComplexDouble) = asin(sin(theta1) * n1 / n2)
 
+    /**
+     * Transmission coefficient calculated according to Fresnel equations
+     */
     private fun transmission(
         theta1: ComplexDouble,
         n1: ComplexDouble,
@@ -50,6 +71,9 @@ class TransferMatrix {
         }
     }
 
+    /**
+     * Reflection coefficient calculated according to Fresnel equations
+     */
     private fun reflection(
         theta1: ComplexDouble,
         n1: ComplexDouble,

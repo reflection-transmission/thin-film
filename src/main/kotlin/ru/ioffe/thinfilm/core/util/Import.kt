@@ -16,7 +16,6 @@ class Import(private val context: ExperimentContext, private val transmitted: Bo
             ExperimentSeries(
                 spectrum, file.name,
                 enabled = true,
-                imported = true,
                 transmission = transmitted,
                 reflection = !transmitted,
                 absorption = false

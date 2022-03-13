@@ -6,6 +6,7 @@ class Interpolate {
 
     /**
      * Returns interpolated value y for passed wavelength value using xs and ys points.
+     * Uses Apache Commons Maths, for more info check corresponding documentation
      */
     fun value(xs: DoubleArray, ys: DoubleArray, wavelength: Double): Double {
         val closest = Closest(xs).forValue(wavelength)

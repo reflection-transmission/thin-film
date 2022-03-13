@@ -4,6 +4,9 @@ import ru.ioffe.thinfilm.core.model.*
 import ru.ioffe.thinfilm.net.RefractiveIndex
 import java.util.function.Consumer
 
+/**
+ * Context class. Stores current section context.
+ */
 class ExperimentContext {
 
     private val materials = Registry<Material>(
@@ -17,7 +20,6 @@ class ExperimentContext {
         default = ExperimentSeries(
             Spectrum(Layer(depth = 100.0), emptyList()), "default",
             enabled = false,
-            imported = false,
             transmission = true,
             reflection = true,
             absorption = true
