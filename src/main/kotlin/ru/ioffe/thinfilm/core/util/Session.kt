@@ -1,19 +1,20 @@
 package ru.ioffe.thinfilm.core.util
 
 import ru.ioffe.thinfilm.core.model.*
-import ru.ioffe.thinfilm.net.RefractiveIndex
+import ru.ioffe.thinfilm.net.RefractiveIndexData
+import tornadofx.asObservable
 import java.util.function.Consumer
 
 /**
  * Context class. Stores current section context.
  */
-class ExperimentContext {
+class Session {
 
     private val materials = Registry<Material>(
-        default = Material.Defined("Air", RefractiveIndex.Constant(1.0)),
-        Material.Defined("Air", RefractiveIndex.Constant(1.0)),
-        Material.Defined("Constant 2.3", RefractiveIndex.Constant(2.3)),
-        Material.Defined("Constant 1.5", RefractiveIndex.Constant(1.5))
+        default = Material("Air", RefractiveIndexData.Constant(1.0).index()),
+        Material("Air", RefractiveIndexData.Constant(1.0).index()),
+        Material("Constant 2.3", RefractiveIndexData.Constant(2.3).index()),
+        Material("Constant 1.5", RefractiveIndexData.Constant(1.5).index())
     )
 
     private val spectrums = Registry(
@@ -26,6 +27,12 @@ class ExperimentContext {
         )
     )
 
+    private val layers = mutableListOf(
+        LayerModel(LayerModel.Ambient, 1.0, materials.get(materials.values()[0])),
+        LayerModel(LayerModel.Film, 200.0, materials.get(materials.values()[1])),
+        LayerModel(LayerModel.Substrate, 1.0, materials.get(materials.values()[2]))
+    ).asObservable()
+
     private val sources = Registry(default = LightSource.flat("default"), LightSource.flat("Flat Spectrum"))
 
     private val hooks = mutableListOf<Consumer<List<ExperimentSeries>>>()
@@ -37,6 +44,8 @@ class ExperimentContext {
     fun sources() = sources
 
     fun hooks() = hooks
+
+    fun layers() = layers
 
     fun refresh() {
         hooks.forEach { action ->

@@ -28,6 +28,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:multik-api:0.1.1")
     implementation("org.jetbrains.kotlinx:multik-default:0.1.1")
     implementation("org.snakeyaml:snakeyaml-engine:2.3")
+    implementation("com.google.code.gson:gson:2.9.0")
     testImplementation(kotlin("test"))
 }
 

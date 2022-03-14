@@ -15,6 +15,10 @@ class Registry<T>(private val default: T, vararg content: T) {
         return registry[reference] ?: default
     }
 
+    fun get(value: T): Reference<T> {
+        return registry.filterValues { it == value }.keys.first()
+    }
+
     private fun added(item: T): Boolean {
         return registry.containsValue(item)
     }
@@ -46,6 +50,6 @@ class Registry<T>(private val default: T, vararg content: T) {
         subscribers.remove(subscriber)
     }
 
-    fun values() : List<T> = registry.values.toList()
+    fun values(): List<T> = registry.values.toList()
 
 }

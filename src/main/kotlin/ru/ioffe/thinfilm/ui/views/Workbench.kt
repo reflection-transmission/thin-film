@@ -18,25 +18,24 @@ import ru.ioffe.thinfilm.core.math.WavelengthDomain
 import ru.ioffe.thinfilm.core.model.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.LightSource
 import ru.ioffe.thinfilm.core.model.Material
-import ru.ioffe.thinfilm.core.util.ExperimentContext
+import ru.ioffe.thinfilm.core.util.Session
 import ru.ioffe.thinfilm.core.util.Import
 import ru.ioffe.thinfilm.core.util.Reference
-import ru.ioffe.thinfilm.ui.databinding.LayerModel
+import ru.ioffe.thinfilm.core.model.LayerModel
 import ru.ioffe.thinfilm.ui.views.hooks.ChartHook
 import ru.ioffe.thinfilm.ui.views.hooks.TextHook
 import tornadofx.*
 
 class Workbench : View() {
 
-    private val layers = mutableListOf<LayerModel>().asObservable()
-
     private val from = SimpleIntegerProperty(400)
+
     private val to = SimpleIntegerProperty(1600)
     private val output = SimpleStringProperty()
     private val source = SimpleObjectProperty<Reference<LightSource>>()
     private val color = SimpleObjectProperty(Color.valueOf("#ffffff"))
-
-    private val context = ExperimentContext()
+    private val context = Session()
+    private val layers = context.layers()
     private val indexes = FXCollections.observableArrayList<Reference<Material>>()
     private val spectrums = FXCollections.observableArrayList<Reference<ExperimentSeries>>()
     private val sources = FXCollections.observableArrayList<Reference<LightSource>>()
@@ -47,9 +46,6 @@ class Workbench : View() {
         context.spectrums().subscribe(spectrums)
         context.sources().subscribe(sources)
         source.value = sources[0]
-        layers.add(LayerModel(LayerModel.Ambient, 1.0, indexes[0]))
-        layers.add(LayerModel(LayerModel.Film, 200.0, indexes[1]))
-        layers.add(LayerModel(LayerModel.Substrate, 1.0, indexes[2]))
     }
 
     override fun onUndock() {

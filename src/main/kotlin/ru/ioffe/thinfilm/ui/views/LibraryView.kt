@@ -10,14 +10,14 @@ import javafx.scene.control.TreeItem
 import javafx.scene.control.TreeView
 import javafx.scene.paint.Color
 import ru.ioffe.thinfilm.core.model.Material
+import ru.ioffe.thinfilm.core.model.RefractiveIndex
 import ru.ioffe.thinfilm.core.util.Reference
-import ru.ioffe.thinfilm.core.util.ExperimentContext
+import ru.ioffe.thinfilm.core.util.Session
 import ru.ioffe.thinfilm.net.Library
-import ru.ioffe.thinfilm.net.RefractiveIndex
 import ru.ioffe.thinfilm.net.Shelf
 import tornadofx.*
 
-class LibraryView(private val context: ExperimentContext) : View() {
+class LibraryView(private val context: Session) : View() {
 
     private val library = Library()
     private val search = SimpleStringProperty("")
@@ -27,7 +27,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
     init {
         title = "RefractiveIndex.info Library"
         context.materials().subscribe(selected)
-        selected.removeIf { context.materials().get(it).index() is RefractiveIndex.Constant }
+        selected.removeIf { context.materials().get(it).dispersion.constant }
     }
 
     override fun onUndock() {
@@ -92,12 +92,12 @@ class LibraryView(private val context: ExperimentContext) : View() {
         lateinit var material: RefractiveIndex
         if (value is Shelf.Book.Page) {
             material = material(value)
-            val entry = Material.Defined(value.toString(), material)
+            val entry = Material(value.toString(), material)
             add.action {
                 context.materials().add(entry)
             }
         } else if (value is Reference<*>) {
-            material = context.materials().get(value as Reference<Material>).index()
+            material = context.materials().get(value as Reference<Material>).dispersion
         } else {
             return
         }
@@ -152,7 +152,7 @@ class LibraryView(private val context: ExperimentContext) : View() {
     }
 
     private fun material(page: Shelf.Book.Page): RefractiveIndex {
-        return library.entry(page).data[0]
+        return library.entry(page).data[0].index()
     }
 
 }

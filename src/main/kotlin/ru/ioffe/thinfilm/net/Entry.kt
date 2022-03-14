@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 data class Entry(
     @SerialName("REFERENCES") val references: String,
     @SerialName("COMMENTS") val comments: String = "",
-    @SerialName("DATA") val data: List<RefractiveIndex>,
+    @SerialName("DATA") val data: List<RefractiveIndexData>,
     @SerialName("SPECS") val specs: Map<String, String> = mutableMapOf()
 )

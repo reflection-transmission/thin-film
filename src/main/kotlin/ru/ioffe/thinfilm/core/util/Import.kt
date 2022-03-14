@@ -6,7 +6,7 @@ import ru.ioffe.thinfilm.core.model.Spectrum
 import ru.ioffe.thinfilm.core.model.Wavelength
 import java.io.File
 
-class Import(private val context: ExperimentContext, private val transmitted: Boolean = false) {
+class Import(private val context: Session, private val transmitted: Boolean = false) {
 
     fun apply(file: File) {
         val lines = file.useLines { it.toList() }

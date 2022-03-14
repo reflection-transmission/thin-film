@@ -4,6 +4,7 @@ package ru.ioffe.thinfilm.core.model
  * An object that stores the current state of monochromatic light ray. All properties are immutable,
  * thus on every change you have to create a new instance
  */
+@kotlinx.serialization.Serializable
 data class Wavelength(
     val length: Double,
     val angle: Double,

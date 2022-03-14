@@ -1,8 +1,6 @@
-package ru.ioffe.thinfilm.ui.databinding
+package ru.ioffe.thinfilm.core.model
 
 import javafx.beans.property.*
-import ru.ioffe.thinfilm.core.model.Layer
-import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.core.util.Reference
 import ru.ioffe.thinfilm.core.util.Registry
 import tornadofx.*
@@ -29,6 +27,6 @@ class LayerModel(
     var material by materialProperty
 
     fun layer(registry: Registry<Material>): Layer =
-        Layer(depth, registry.get(material).index())
+        Layer(depth, registry.get(material).dispersion)
 
 }

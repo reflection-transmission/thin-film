@@ -10,11 +10,11 @@ import org.jetbrains.kotlinx.multik.ndarray.data.D2Array
 import org.jetbrains.kotlinx.multik.ndarray.data.get
 import ru.ioffe.thinfilm.core.math.TransferMatrix
 import ru.ioffe.thinfilm.core.model.*
-import ru.ioffe.thinfilm.core.util.ExperimentContext
+import ru.ioffe.thinfilm.core.util.Session
 import kotlin.math.pow
 
 class Experiment(
-    private val context: ExperimentContext,
+    private val context: Session,
     private val source: LightSource,
     private val layers: MutableList<Layer>
 ) {

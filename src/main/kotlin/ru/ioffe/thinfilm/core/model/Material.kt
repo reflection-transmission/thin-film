@@ -1,10 +1,7 @@
 package ru.ioffe.thinfilm.core.model
 
-import ru.ioffe.thinfilm.net.RefractiveIndex
-
-sealed class Material(val name: String) {
-
-    abstract fun index(): RefractiveIndex
+@kotlinx.serialization.Serializable
+class Material(val name: String, val dispersion: RefractiveIndex) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -21,12 +18,6 @@ sealed class Material(val name: String) {
 
     override fun hashCode(): Int {
         return name.hashCode()
-    }
-
-    class Defined(name: String, private val properties: RefractiveIndex) : Material(name) {
-
-        override fun index(): RefractiveIndex = properties
-
     }
 
 }
