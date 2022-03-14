@@ -10,6 +10,7 @@ import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
 import javafx.scene.control.Alert
 import javafx.scene.control.ButtonType
+import javafx.scene.control.TableView
 import javafx.scene.paint.Color
 import javafx.stage.FileChooser.ExtensionFilter
 import javafx.util.converter.NumberStringConverter
@@ -22,6 +23,7 @@ import ru.ioffe.thinfilm.core.util.Session
 import ru.ioffe.thinfilm.core.util.Import
 import ru.ioffe.thinfilm.core.util.Reference
 import ru.ioffe.thinfilm.core.model.LayerModel
+import ru.ioffe.thinfilm.core.persistence.Persistence
 import ru.ioffe.thinfilm.ui.views.hooks.ChartHook
 import ru.ioffe.thinfilm.ui.views.hooks.TextHook
 import tornadofx.*
@@ -35,10 +37,12 @@ class Workbench : View() {
     private val source = SimpleObjectProperty<Reference<LightSource>>()
     private val color = SimpleObjectProperty(Color.valueOf("#ffffff"))
     private var context = Session()
-    private val layers = context.layers()
+    private var layers = context.layers()
     private val indexes = FXCollections.observableArrayList<Reference<Material>>()
     private val spectrums = FXCollections.observableArrayList<Reference<ExperimentSeries>>()
     private val sources = FXCollections.observableArrayList<Reference<LightSource>>()
+    private lateinit var chart: LineChart<Number, Number>
+    private lateinit var table: TableView<LayerModel>
 
     init {
         title = "Thin Film Calculator"
@@ -54,15 +58,50 @@ class Workbench : View() {
         context.spectrums().unsubscribe(spectrums)
     }
 
+    private fun changeSession(new: Session) {
+        context.materials().unsubscribe(indexes)
+        context.spectrums().unsubscribe(spectrums)
+        context.sources().unsubscribe(sources)
+        context = new
+        indexes.clear()
+        spectrums.clear()
+        sources.clear()
+        context.materials().subscribe(indexes)
+        context.spectrums().subscribe(spectrums)
+        context.sources().subscribe(sources)
+        context.hooks().add(TextHook(output))
+        context.hooks().add(ChartHook(chart))
+        layers = context.layers()
+        table.items = layers
+        source.value = sources[0]
+        title = new.name()
+    }
+
     override val root = gridpane {
         vgap = 5.0
         style {
             padding = box(5.px)
         }
-        lateinit var chart: LineChart<Number, Number>
         row {
             hbox(spacing = 5) {
-
+                button("\uD83D\uDCC2") {
+                    action {
+                        chooseFile(
+                            "Choose session file",
+                            arrayOf(ExtensionFilter("Experiment data", "*.exp")),
+                            mode = FileChooserMode.Single
+                        ).forEach { changeSession(Persistence().load(it)) }
+                    }
+                }
+                button("\uD83D\uDCBE") {
+                    action {
+                        chooseFile(
+                            "Choose a file to save",
+                            arrayOf(ExtensionFilter("Experiment data", "*.exp")),
+                            mode = FileChooserMode.Save
+                        ).forEach { Persistence().save(it, context) }
+                    }
+                }
                 button("\uD83D\uDCDA") {
                     action {
                         openInternalWindow(LibraryView(context))
@@ -138,7 +177,7 @@ class Workbench : View() {
         }
         row {
             hbox {
-                tableview(layers) {
+                table = tableview(layers) {
                     isEditable = true
                     readonlyColumn("Type", LayerModel::typeProperty).cellFormat {
                         alignment = Pos.BASELINE_CENTER

@@ -16,7 +16,7 @@ class LayerModel(
         const val Film = 0
         const val Substrate = 2
         fun create(layer: Layer, registry: Registry<Material>): LayerModel {
-            return LayerModel(Film, layer.depth, registry.get(layer.material))
+            return LayerModel(layer.type, layer.depth, registry.get(layer.material))
         }
     }
 
@@ -30,6 +30,6 @@ class LayerModel(
     var material by materialProperty
 
     fun layer(registry: Registry<Material>): Layer =
-        Layer(depth, registry.get(material))
+        Layer(type, depth, registry.get(material))
 
 }

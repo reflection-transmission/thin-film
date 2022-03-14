@@ -12,7 +12,7 @@ import java.util.stream.Collectors
  */
 class Session {
 
-    private val materials = Registry<Material>(
+    private val materials = Registry(
         default = Material("Air", RefractiveIndexData.Constant(1.0).index()),
         Material("Air", RefractiveIndexData.Constant(1.0).index()),
         Material("Constant 2.3", RefractiveIndexData.Constant(2.3).index()),
@@ -21,7 +21,7 @@ class Session {
 
     private val spectrums = Registry(
         default = ExperimentSeries(
-            Series(Spectrum(Layer(depth = 100.0, Material.air()), emptyList()), "default"),
+            Series(Spectrum(Layer(type = 0, depth = 100.0, Material.air()), emptyList()), "default"),
             enabled = false,
             transmission = true,
             reflection = true,

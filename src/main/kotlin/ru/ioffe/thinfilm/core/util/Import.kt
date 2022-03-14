@@ -9,7 +9,7 @@ class Import(private val context: Session, private val transmitted: Boolean = fa
     fun apply(file: File) {
         val lines = file.useLines { it.toList() }
         val data = lines.subList(lines.indexOf("<Data>") + 1, lines.indexOf("<EndData>"))
-        val spectrum = Spectrum(Layer(depth = 100.0, Material.air()), data.map(this::wavelength))
+        val spectrum = Spectrum(Layer(type = 0, depth = 100.0, Material.air()), data.map(this::wavelength))
         context.spectrums().add(
             ExperimentSeries(
                 Series(spectrum, file.name),

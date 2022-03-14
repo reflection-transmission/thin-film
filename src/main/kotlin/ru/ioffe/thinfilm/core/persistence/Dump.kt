@@ -38,6 +38,7 @@ data class Dump(
                 )
             )
         }
+        session.layers().clear()
         session.layers().addAll(layers.map { LayerModel.create(it, session.materials()) })
         return session
     }
