@@ -11,6 +11,7 @@ import org.jetbrains.kotlinx.multik.ndarray.data.get
 import ru.ioffe.thinfilm.core.math.TransferMatrix
 import ru.ioffe.thinfilm.core.model.*
 import ru.ioffe.thinfilm.core.util.Session
+import ru.ioffe.thinfilm.ui.ExperimentSeries
 import kotlin.math.pow
 
 class Experiment(
@@ -21,12 +22,11 @@ class Experiment(
 
     private val tm = TransferMatrix()
 
-    fun start(name: String) : Spectrum {
+    fun start(name: String): Spectrum {
         val spectrum = Spectrum(layers[0], source.profile.map(this::film))
         context.spectrums().add(
             ExperimentSeries(
-                spectrum,
-                name,
+                Series(spectrum, name),
                 enabled = true,
                 transmission = true,
                 reflection = true,
@@ -46,13 +46,13 @@ class Experiment(
     private fun calculate(layers: List<Layer>, wavelength: Double): DoubleArray {
         val matrix = m(layers, wavelength)
         return doubleArrayOf(
-            (1 / matrix[0, 0]).abs().pow(2) * layers.last().index.n(wavelength) / layers.first().index.n(wavelength),
+            (1 / matrix[0, 0]).abs().pow(2) * layers.last().material.dispersion.n(wavelength) / layers.first().material.dispersion.n(wavelength),
             (matrix[1, 0] / matrix[0, 0]).abs().pow(2)
         )
     }
 
     private fun m(layers: List<Layer>, wavelength: Double): D2Array<ComplexDouble> {
-        val n = layers.map { it.index.value(wavelength) }
+        val n = layers.map { it.material.dispersion.value(wavelength) }
         val incidenceAngle = ComplexDouble(0.0)
         val theta = angles(incidenceAngle, n)
         var m = mk.identity<ComplexDouble>(2)

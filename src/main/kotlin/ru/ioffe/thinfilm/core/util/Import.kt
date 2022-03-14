@@ -1,9 +1,7 @@
 package ru.ioffe.thinfilm.core.util
 
-import ru.ioffe.thinfilm.core.model.ExperimentSeries
-import ru.ioffe.thinfilm.core.model.Layer
-import ru.ioffe.thinfilm.core.model.Spectrum
-import ru.ioffe.thinfilm.core.model.Wavelength
+import ru.ioffe.thinfilm.core.model.*
+import ru.ioffe.thinfilm.ui.ExperimentSeries
 import java.io.File
 
 class Import(private val context: Session, private val transmitted: Boolean = false) {
@@ -11,10 +9,10 @@ class Import(private val context: Session, private val transmitted: Boolean = fa
     fun apply(file: File) {
         val lines = file.useLines { it.toList() }
         val data = lines.subList(lines.indexOf("<Data>") + 1, lines.indexOf("<EndData>"))
-        val spectrum = Spectrum(Layer(depth = 100.0), data.map(this::wavelength))
+        val spectrum = Spectrum(Layer(depth = 100.0, Material.air()), data.map(this::wavelength))
         context.spectrums().add(
             ExperimentSeries(
-                spectrum, file.name,
+                Series(spectrum, file.name),
                 enabled = true,
                 transmission = transmitted,
                 reflection = !transmitted,

@@ -1,11 +1,12 @@
-package ru.ioffe.thinfilm.core.model
+package ru.ioffe.thinfilm.ui
 
 import javafx.beans.property.SimpleBooleanProperty
+import ru.ioffe.thinfilm.core.model.Series
+import ru.ioffe.thinfilm.core.model.Spectrum
 import tornadofx.*
 
 class ExperimentSeries(
-    val spectrum: Spectrum,
-    private val name: String,
+    val series: Series,
     enabled: Boolean,
     transmission: Boolean,
     reflection: Boolean,
@@ -25,7 +26,7 @@ class ExperimentSeries(
     var absorption by absorptionProperty
 
     override fun toString(): String {
-        return name
+        return series.name
     }
 
 }

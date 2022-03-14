@@ -2,7 +2,7 @@ package ru.ioffe.thinfilm.ui.views.hooks
 
 import javafx.scene.chart.LineChart
 import javafx.scene.chart.NumberAxis
-import ru.ioffe.thinfilm.core.model.ExperimentSeries
+import ru.ioffe.thinfilm.ui.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.Spectrum
 import tornadofx.data
 import tornadofx.series
@@ -13,7 +13,7 @@ class ChartHook(private val chart: LineChart<Number, Number>) : Consumer<List<Ex
     override fun accept(spectrums: List<ExperimentSeries>) {
         invalidateChart()
         spectrums.forEach { series ->
-            val spectrum = series.spectrum
+            val spectrum = series.series.spectrum
             resizeChart(spectrum)
             if (series.transmission) {
                 chart.series("Transmitted") {

@@ -15,6 +15,9 @@ class LayerModel(
         const val Ambient = 1
         const val Film = 0
         const val Substrate = 2
+        fun create(layer: Layer, registry: Registry<Material>): LayerModel {
+            return LayerModel(Film, layer.depth, registry.get(layer.material))
+        }
     }
 
     val typeProperty = SimpleIntegerProperty(type)
@@ -27,6 +30,6 @@ class LayerModel(
     var material by materialProperty
 
     fun layer(registry: Registry<Material>): Layer =
-        Layer(depth, registry.get(material).dispersion)
+        Layer(depth, registry.get(material))
 
 }

@@ -1,4 +1,4 @@
 package ru.ioffe.thinfilm.core.model
 
 @kotlinx.serialization.Serializable
-data class Spectrum(val ambient: Layer, val wavelengths: List<Wavelength>)
+data class Series(val spectrum: Spectrum, val name: String)

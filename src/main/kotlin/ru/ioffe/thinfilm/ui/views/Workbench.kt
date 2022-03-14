@@ -15,7 +15,7 @@ import javafx.stage.FileChooser.ExtensionFilter
 import javafx.util.converter.NumberStringConverter
 import ru.ioffe.thinfilm.core.Experiment
 import ru.ioffe.thinfilm.core.math.WavelengthDomain
-import ru.ioffe.thinfilm.core.model.ExperimentSeries
+import ru.ioffe.thinfilm.ui.ExperimentSeries
 import ru.ioffe.thinfilm.core.model.LightSource
 import ru.ioffe.thinfilm.core.model.Material
 import ru.ioffe.thinfilm.core.util.Session
@@ -34,7 +34,7 @@ class Workbench : View() {
     private val output = SimpleStringProperty()
     private val source = SimpleObjectProperty<Reference<LightSource>>()
     private val color = SimpleObjectProperty(Color.valueOf("#ffffff"))
-    private val context = Session()
+    private var context = Session()
     private val layers = context.layers()
     private val indexes = FXCollections.observableArrayList<Reference<Material>>()
     private val spectrums = FXCollections.observableArrayList<Reference<ExperimentSeries>>()
