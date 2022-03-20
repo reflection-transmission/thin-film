@@ -59,13 +59,8 @@ class Workbench : View() {
     }
 
     private fun changeSession(new: Session) {
-        context.materials().unsubscribe(indexes)
-        context.spectrums().unsubscribe(spectrums)
-        context.sources().unsubscribe(sources)
+        unsubscribe()
         context = new
-        indexes.clear()
-        spectrums.clear()
-        sources.clear()
         context.materials().subscribe(indexes)
         context.spectrums().subscribe(spectrums)
         context.sources().subscribe(sources)
@@ -75,6 +70,12 @@ class Workbench : View() {
         table.items = layers
         source.value = sources[0]
         title = new.name()
+    }
+
+    private fun unsubscribe() {
+        context.materials().unsubscribe(indexes)
+        context.spectrums().unsubscribe(spectrums)
+        context.sources().unsubscribe(sources)
     }
 
     override val root = gridpane {
