@@ -1,20 +1,40 @@
-# Тонкие плёнки
+# Thin-Film Calculator
 
-## Как запустить dev-версию:
+## Features
 
-<img alt="alt text" src="img/1.png" width="500" height="auto"/>
-<p></p>
-<img alt="alt text" src="img/2.png" width="500" height="auto"/>
-<p></p>
-<img alt="alt text" src="img/3.png" width="500" height="auto"/>
+- calculates transition and reflection spectrums for the specified layers stack using 
+<a href="https://en.wikipedia.org/wiki/Transfer-matrix_method_(optics)">TMM</a>
+- beautiful User Interface baked with TornadoFX
+- calculates reflection spectrum visible color according to CIE 1965 color curves approximation[1]
+- integration with <a href="https://refractiveindex.info">RefractiveIndex.info</a> database - you can observe and use data directly from 
+the database
+- simple persistence - save all the experiment data in JSON-based _.exp_ format
+- you can load spectrum measurements results directly to the in-app graph to compare it with the
+theoretical calculations or fit it somehow.
 
-## Как пользоваться
+## Building and Running
 
-Кнопкой **Append Layer** можно добавить новый слой в таблицу. В таблице 
-параметры каждого слоя редактируются нажатием на параметр. Для начала расчёта нужно минимум три слоя, причём 
-верхний принимается за среду (ambient), а нижний за подложку (substrate). Для добавления материалов
-нужно открыть меню библиотеки сверху (либо нажать Ctrl+L), где из предложенных материалов и диапазонов выбрать нужный
-Вам. После нажатия кнопки **Add** материал будет доступен для выбора в параметрах слоёв в таблице.
-Кнопка **Tail Layer** удаляет последний слой. Также сверху задаются нижняя и верхняя границы длин волн для расчёта.
+To build a jar use:
 
-<img alt="alt text" src="img/4.png" width="500" height="auto"/>
+`gradle assemble`
+
+To run the application:
+
+`gradle run`
+
+Note that all the commands have to be executed in project's root directory.
+
+## Screenshots
+
+<img src="img/tfc1.png" width="500"/>
+<img src="img/tfc2.png" width="500"/>
+
+## License
+For the source code see LICENSE file.
+
+Binaries are publicly available on "as is" basis without any restrictions.
+
+## References
+1. Chris Wyman, Peter-Pike Sloan, and Peter Shirley, Simple Analytic Approximations
+   to the CIE XYZ Color Matching Functions, Journal of Computer Graphics Techniques (JCGT), vol. 2, no. 2, 1-11, 2013
+   Available online http://jcgt.org/published/0002/02/01/
