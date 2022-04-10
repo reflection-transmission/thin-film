@@ -38,16 +38,20 @@ class Experiment(
     }
 
     private fun film(it: Wavelength): Wavelength {
-        val trRf = calculate(layers, it.length)
+        val trRf = calculate(layers, it.length, intensity = it.transmitted)
         return Wavelength(it.length, it.angle, trRf[0], trRf[1])
     }
 
 
-    private fun calculate(layers: List<Layer>, wavelength: Double): DoubleArray {
+    private fun calculate(layers: List<Layer>, wavelength: Double, intensity: Double): DoubleArray {
         val matrix = m(layers, wavelength)
         return doubleArrayOf(
-            (1 / matrix[0, 0]).abs().pow(2) * layers.last().material.dispersion.n(wavelength) / layers.first().material.dispersion.n(wavelength),
-            (matrix[1, 0] / matrix[0, 0]).abs().pow(2)
+            intensity * (1 / matrix[0, 0]).abs()
+                .pow(2) * layers.last().material.dispersion.n(wavelength) / layers.first().material.dispersion.n(
+                wavelength
+            ),
+            intensity
+                    * (matrix[1, 0] / matrix[0, 0]).abs().pow(2)
         )
     }
 

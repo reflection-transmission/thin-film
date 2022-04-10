@@ -35,7 +35,7 @@ class Session {
         LayerModel(LayerModel.Substrate, 1.0, materials.get(materials.values()[2]))
     ).asObservable()
 
-    private val sources = Registry(default = LightSource.flat("default"), LightSource.flat("Flat Spectrum"))
+    private val sources = Registry(default = LightSource.flat("default"), LightSource.flat("Flat Spectrum"), LightSource.blackBody())
 
     private val hooks = mutableListOf<Consumer<List<ExperimentSeries>>>()
 

@@ -21,6 +21,7 @@ class Color(private val spectrum: Spectrum) {
     fun toRGB(): String {
         val xyz = spectrum.wavelengths.filter { it.length > .38 && it.length < .78 }.toXYZ()
         val color = XYZ(xyz[0], xyz[1], xyz[2])
+        println(color)
         return color.toRGB(SRGB).toHex()
     }
 
@@ -39,7 +40,7 @@ class Color(private val spectrum: Spectrum) {
      * Approximate functions of CIE color weights
      */
     private fun x(lambda: Int) = 0.398 * exp(-1250 * (ln((lambda + 570.1) / 1014).pow(2))) + 1.132 * exp(
-        -234 * (ln((1138 - lambda) / 743.5).pow(2))
+        -234 * (ln((1338 - lambda) / 743.5).pow(2))
     )
 
     private fun y(lambda: Int) = 1.011 * exp(-0.5 * (((lambda - 556.1) / 46.14).pow(2)))
