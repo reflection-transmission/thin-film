@@ -62,7 +62,7 @@ class Experiment(
         var m = mk.identity<ComplexDouble>(2)
         for (i in 1 until layers.size - 1) {
             m = m.dot(tm.propagation(n[i], layers[i].depth, wavelength * 1000))
-                .dot(tm.refraction(n[1], n[2], theta[i]))
+                .dot(tm.refraction(n[i], n[i + 1], theta[i]))
         }
         return tm.refraction(n[0], n[1], theta[0]).dot(m)
     }
