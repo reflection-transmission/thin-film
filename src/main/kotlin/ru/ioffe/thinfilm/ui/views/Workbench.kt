@@ -70,12 +70,16 @@ class Workbench : View() {
         table.items = layers
         source.value = sources[0]
         title = new.name()
+        context.refresh()
     }
 
     private fun unsubscribe() {
         context.materials().unsubscribe(indexes)
+        context.materials().clear()
         context.spectrums().unsubscribe(spectrums)
+        context.spectrums().clear()
         context.sources().unsubscribe(sources)
+        context.sources().clear()
     }
 
     override val root = gridpane {
@@ -153,7 +157,7 @@ class Workbench : View() {
                                 header = "Select data type for file ${file.name}",
                                 title = "Select data type",
                                 buttons = arrayOf(ButtonType("Transmitted"), ButtonType("Reflected")),
-                                actionFn = { alert -> Import(context, alert.text == "Transmitted").apply(file) })
+                                actionFn = { alert -> color.set(Color.valueOf(ru.ioffe.thinfilm.core.math.Color(Import(context, alert.text == "Transmitted").apply(file)).toRGB())) })
                         }
 
                     }

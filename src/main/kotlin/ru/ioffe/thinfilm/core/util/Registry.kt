@@ -39,6 +39,10 @@ class Registry<T>(private val default: T, vararg content: T) {
         }
     }
 
+    fun clear() {
+        registry.clear()
+    }
+
     private fun reference(item: T) = registry.filterValues { it == item }.keys.first()
 
     fun subscribe(subscriber: ObservableList<Reference<T>>) {

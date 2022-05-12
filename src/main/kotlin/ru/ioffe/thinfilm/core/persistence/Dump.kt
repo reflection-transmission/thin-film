@@ -34,7 +34,7 @@ data class Dump(
                     it,
                     enabled = false,
                     transmission = false,
-                    reflection = false
+                    reflection = true
                 )
             )
         }

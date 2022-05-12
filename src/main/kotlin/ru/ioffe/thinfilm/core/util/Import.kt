@@ -6,7 +6,7 @@ import java.io.File
 
 class Import(private val context: Session, private val transmitted: Boolean = false) {
 
-    fun apply(file: File) {
+    fun apply(file: File) :Spectrum {
         val lines = file.useLines { it.toList() }
         val data = lines.subList(lines.indexOf("<Data>") + 1, lines.indexOf("<EndData>"))
         val spectrum = Spectrum(Layer(type = 0, depth = 100.0, Material.air()), data.map(this::wavelength))
@@ -20,6 +20,7 @@ class Import(private val context: Session, private val transmitted: Boolean = fa
             )
         )
         context.refresh()
+        return spectrum
     }
 
     private fun wavelength(line: String): Wavelength {
