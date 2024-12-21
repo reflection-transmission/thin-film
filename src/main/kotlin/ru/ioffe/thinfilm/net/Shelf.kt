@@ -11,7 +11,7 @@ class Shelf(@SerialName("SHELF") val shelf: String, val name: String, val conten
     }
 
     @Serializable
-    data class Book(@SerialName("BOOK") val book: String, var name: String, val info: String, val content: List<Page>) {
+    data class Book(@SerialName("BOOK") val book: String, var name: String, val info: String = "", val content: List<Page>) {
 
         init {
             name = name.replace("<sub>", "").replace("</sub>", "")

@@ -12,7 +12,7 @@ import java.util.stream.Collectors
 class Library {
 
     fun fetch(): List<Shelf> {
-        val library = load("library.yml")
+        val library = load("catalog-nk.yml")
             .clean()
             .parse(ListSerializer(Shelf.serializer()))
         library.flatMap(Shelf::content).forEach { book -> book.content.forEach { it.book = book.name } }
@@ -20,7 +20,7 @@ class Library {
     }
 
     fun entry(page: Shelf.Book.Page): Entry {
-        return load("data/".plus(page.data).replace(" ", "%20")).parse(Entry.serializer())
+        return load("data-nk/".plus(page.data).replace(" ", "%20")).parse(Entry.serializer())
     }
 
     private fun load(file: String): String {
